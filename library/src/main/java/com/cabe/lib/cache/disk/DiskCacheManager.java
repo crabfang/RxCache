@@ -83,7 +83,7 @@ public class DiskCacheManager {
             throw RxException.build(DiskExceptionCode.DISK_EXCEPTION_GET, ignored);
         }
     }
-    public synchronized <T> boolean put(TypeToken<T> typeToken, Object obj){
+    public synchronized <T> boolean put(TypeToken<T> typeToken, T obj){
         String json = new Gson().toJson(obj);
         try {
             DiskLruCache.Editor editor = cache.edit(getTypeTokenKey(typeToken));

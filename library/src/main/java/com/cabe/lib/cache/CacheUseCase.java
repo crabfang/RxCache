@@ -23,11 +23,16 @@ public class CacheUseCase<T> extends UseCase<T> {
     public static String DISK_CACHE_PATH = "";
     private DiskCacheManager manager;
     private RequestParams params = null;
+    private boolean diskOnly = false;
     public CacheUseCase(TypeToken<T> typeT, RequestParams params) {
         super(typeT);
         super.setExecutor(null);
         super.setPostThread(null);
         this.params = params;
+    }
+
+    public void setDiskOnly(boolean diskOnly) {
+        this.diskOnly = diskOnly;
     }
 
     @Override
@@ -83,7 +88,9 @@ public class CacheUseCase<T> extends UseCase<T> {
                 @Override
                 public void complete(CacheSource from) {
                     presenter.complete(from);
-                    executeHttp(presenter);
+                    if(!diskOnly) {
+                        executeHttp(presenter);
+                    }
                 }
             }));
         }
