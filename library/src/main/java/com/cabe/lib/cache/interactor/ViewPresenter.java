@@ -7,7 +7,7 @@ import com.cabe.lib.cache.CacheSource;
  * Created by cabe on 16/4/13.
  */
 public interface ViewPresenter<T> {
-    void error(CacheSource source, int code, String info);
-    void load(CacheSource source, T data);
-    void complete(CacheSource source);
+    void error(CacheSource from, int code, String info);
+    void load(CacheSource from, T data);
+    void complete(CacheSource from);
 }

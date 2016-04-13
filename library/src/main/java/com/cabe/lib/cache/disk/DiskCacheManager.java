@@ -1,5 +1,7 @@
 package com.cabe.lib.cache.disk;
 
+import android.util.Log;
+
 import com.cabe.lib.cache.exception.DiskExceptionCode;
 import com.cabe.lib.cache.exception.RxException;
 import com.google.gson.Gson;
@@ -24,7 +26,8 @@ public class DiskCacheManager {
             try {
                 File cacheDir = new File(cachePath);
                 if(!cacheDir.exists()) {
-                    cacheDir.mkdirs();
+                    boolean result = cacheDir.mkdirs();
+                    Log.d("DiskCacheManager", "mkdirs " + result);
                 }
                 cache = DiskLruCache.open(cacheDir, BuildConfig.VERSION_CODE, 1, 1024 * 1024 * 10);
             } catch (Exception e) {
@@ -32,7 +35,7 @@ public class DiskCacheManager {
             }
         }
     }
-    public String hashKeyForDisk(String key) {
+    private String hashKeyForDisk(String key) {
         String cacheKey;
         try {
             final MessageDigest mDigest = MessageDigest.getInstance("MD5");
@@ -81,10 +84,9 @@ public class DiskCacheManager {
         }
     }
     public synchronized <T> boolean put(TypeToken<T> typeToken, Object obj){
-        String key = getTypeTokenKey(typeToken);
         String json = new Gson().toJson(obj);
         try {
-            DiskLruCache.Editor editor = cache.edit(key);
+            DiskLruCache.Editor editor = cache.edit(getTypeTokenKey(typeToken));
             editor.set(0, json);
             editor.commit();
             return true;
@@ -92,5 +94,4 @@ public class DiskCacheManager {
             throw RxException.build(DiskExceptionCode.DISK_EXCEPTION_SAVE, e);
         }
     }
-
 }

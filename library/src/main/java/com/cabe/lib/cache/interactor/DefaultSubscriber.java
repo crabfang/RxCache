@@ -14,17 +14,17 @@ public class DefaultSubscriber<T> extends rx.Subscriber<T> {
     public final static int REPOSITORY_DISK = 0;
     public final static int REPOSITORY_HTTP = 1;
 
-    private CacheSource repository;
+    private CacheSource from;
     private ViewPresenter<T> presenter;
-    public DefaultSubscriber(CacheSource repository, ViewPresenter<T> presenter) {
-        this.repository = repository;
+    public DefaultSubscriber(CacheSource from, ViewPresenter<T> presenter) {
+        this.from = from;
         this.presenter = presenter;
     }
     public DefaultSubscriber() {
     }
     @Override public void onCompleted() {
         if(presenter != null) {
-            presenter.complete(repository);
+            presenter.complete(from);
         }
     }
 
@@ -51,13 +51,13 @@ public class DefaultSubscriber<T> extends rx.Subscriber<T> {
             info = new ExceptionCode().getInfo(code);
         }
         if(presenter != null) {
-            presenter.error(repository, code, info);
+            presenter.error(from, code, info);
         }
     }
 
     @Override public void onNext(T t) {
         if(presenter != null) {
-            presenter.load(repository, t);
+            presenter.load(from, t);
         }
     }
 }

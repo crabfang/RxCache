@@ -25,7 +25,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         StringHttpFactory.logLevel = RestAdapter.LogLevel.BASIC;
+        CacheUseCase.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
     }
 
     public void onClick(View v) {
@@ -39,18 +41,17 @@ public class MainActivity extends AppCompatActivity {
         params.query = query;
 
         CacheUseCase<SplashInfo> useCase = new CacheUseCase<>(new TypeToken<SplashInfo>(){}, params);
-        useCase.setCachePath(getExternalCacheDir() + File.separator + "com.cabe.demo.rxcache");
         useCase.execute(new ViewPresenter<SplashInfo>(){
             @Override
-            public void error(CacheSource source, int code, String info) {
+            public void error(CacheSource from, int code, String info) {
                 Log.w(TAG, code + "#" + info);
             }
             @Override
-            public void load(CacheSource source, SplashInfo data) {
+            public void load(CacheSource from, SplashInfo data) {
                 Log.w(TAG, "load:" + data);
             }
             @Override
-            public void complete(CacheSource source) {
+            public void complete(CacheSource from) {
                 Log.w(TAG, "complete");
             }
         });
