@@ -5,18 +5,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.cabe.lib.cache.CacheSource;
 import com.cabe.lib.cache.CacheUseCase;
 import com.cabe.lib.cache.disk.DiskCacheManager;
 import com.cabe.lib.cache.http.RequestParams;
 import com.cabe.lib.cache.http.StringHttpFactory;
+import com.cabe.lib.cache.interactor.ViewPresenter;
 import com.cabe.lib.cache.interactor.impl.SimpleViewPresenter;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit.RestAdapter;
 import rx.Observable;
@@ -37,14 +37,21 @@ public class MainActivity extends AppCompatActivity {
         Log.w(TAG, "click http");
 
         RequestParams params = new RequestParams();
-        params.host = "https://www.u51.com/51rp/rpdservice";
-        params.path = "appLoadingImage.htm";
-        Map<String, String> query = new HashMap<>();
-        query.put("loadingImageType", "android-large");
-        params.query = query;
+        params.host = "https://www.github.com";
+        params.path = "crabfang/RxCache";
 
-        CacheUseCase<SplashInfo> useCase = new CacheUseCase<>(new TypeToken<SplashInfo>(){}, params);
-        useCase.execute(new SimpleViewPresenter<SplashInfo>());
+        CacheUseCase<GitHubBean> useCase = new CacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
+        useCase.execute(new ViewPresenter<GitHubBean>() {
+            @Override
+            public void error(CacheSource from, int code, String info) {
+            }
+            @Override
+            public void load(CacheSource from, GitHubBean data) {
+            }
+            @Override
+            public void complete(CacheSource from) {
+            }
+        });
     }
 
     public void clickDisk(View v) {
