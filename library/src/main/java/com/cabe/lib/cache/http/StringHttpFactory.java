@@ -3,6 +3,9 @@ package com.cabe.lib.cache.http;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.cabe.lib.cache.exception.HttpExceptionCode;
+import com.cabe.lib.cache.exception.RxException;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -23,21 +26,15 @@ import rx.Observable;
  * Created by cabe on 16/4/12.
  */
 public class StringHttpFactory {
-    public static RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.BASIC;
-    public static <T> Observable<T> createRequest(RequestParams params, HttpTransformer<T> transformer) {
+    public static RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
+    public static Observable<String> createRequest(RequestParams params) {
+        if(params == null) {
+            throw RxException.build(HttpExceptionCode.HTTP_STATUS_LOACL_REQUEST_NONE, null);
+        }
         ApiService apiService = buildApiService(params);
-        Observable<String> getApi = params.isPost
+        return params.isPost
                 ? apiService.post(params.path, params.query, params.body)
                 : apiService.get(params.path, params.query);
-        return composePre(getApi, transformer);
-    }
-
-    private static <T> Observable<T> composePre(Observable<String> baseResponse, HttpTransformer<T> transformer) {
-        Observable.Transformer<String, String> schedulerTransformer = transformer.getThreadTransformer();
-        Observable.Transformer<String, T> responseTransformer = transformer.getResponseTransformer();
-        return baseResponse
-                .compose(schedulerTransformer)
-                .compose(responseTransformer);
     }
 
     private static ApiService buildApiService(final RequestParams params) {

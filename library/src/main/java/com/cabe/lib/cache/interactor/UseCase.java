@@ -1,8 +1,15 @@
 package com.cabe.lib.cache.interactor;
 
+import com.cabe.lib.cache.executor.JobExecutor;
+import com.cabe.lib.cache.executor.PostExecutionThread;
+import com.cabe.lib.cache.executor.ThreadExecutor;
+import com.cabe.lib.cache.executor.UIThread;
+import com.google.gson.reflect.TypeToken;
+
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
 
 /**
@@ -10,28 +17,46 @@ import rx.subscriptions.Subscriptions;
  * Created by cabe on 16/4/12.
  */
 public abstract class UseCase<T> {
+    private ThreadExecutor executor = new JobExecutor();
+    private PostExecutionThread postThread = new UIThread();
 
     private Subscription subscription = Subscriptions.empty();
 
-    /**
-     * Builds an {@link rx.Observable} which will be used when executing the current {@link UseCase}.
-     */
-    protected abstract Observable buildUseCaseObservable();
+    private TypeToken<T> typeT;
 
-    /**
-     * Executes the current use case.
-     *
-     * @param UseCaseSubscriber The guy who will be listen to the observable build with {@link #buildUseCaseObservable()}.
-     */
-    @SuppressWarnings("unchecked")
-    public void execute(Subscriber UseCaseSubscriber) {
-        this.subscription = this.buildUseCaseObservable()
-                .subscribe(UseCaseSubscriber);
+    public UseCase(TypeToken<T> typeT) {
+        this.typeT = typeT;
     }
 
-    /**
-     * Unsubscribes from current {@link rx.Subscription}.
-     */
+    public TypeToken<T> getTypeToken() {
+        return typeT;
+    }
+
+    public abstract Observable<T> buildUseCaseObservable();
+
+    public void setExecutor(ThreadExecutor executor) {
+        this.executor = executor;
+    }
+
+    public void setPostThread(PostExecutionThread postThread) {
+        this.postThread = postThread;
+    }
+
+    public void execute(Subscriber<T> subscriber) {
+        Observable<T> observable = this.buildUseCaseObservable();
+        if(executor != null) {
+            observable.subscribeOn(Schedulers.from(executor));
+        }
+        if(postThread != null) {
+            observable.observeOn(postThread.getScheduler());
+        }
+        this.subscription = observable.subscribe(subscriber);
+    }
+
+    public void execute(final ViewPresenter<T> presenter) {
+        execute(new DefaultSubscriber<>(presenter));
+    }
+
     public void unsubscribe() {
         if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();

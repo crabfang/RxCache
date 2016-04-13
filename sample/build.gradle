@@ -5,7 +5,7 @@ android {
     buildToolsVersion "24.0.0 rc2"
 
     defaultConfig {
-        applicationId "com.cabe.lib.rxcache"
+        applicationId "com.cabe.lib.demo.rxcache"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1

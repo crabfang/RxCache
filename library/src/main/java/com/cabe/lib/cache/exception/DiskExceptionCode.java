@@ -6,11 +6,13 @@ package com.cabe.lib.cache.exception;
  */
 public class DiskExceptionCode extends ExceptionCode {
     /** 数据保存到磁盘出错 */
-    public final static int DISK_EXCEPTION_SAVE = -1000;
+    public final static int DISK_EXCEPTION_SAVE = -101;
     /** 磁盘数据检测出错  */
-    public final static int DISK_EXCEPTION_CHECK = -1001;
+    public final static int DISK_EXCEPTION_CHECK = DISK_EXCEPTION_SAVE - 1;
     /** 获取磁盘数据出错  */
-    public final static int DISK_EXCEPTION_GET = -1002;
+    public final static int DISK_EXCEPTION_GET = DISK_EXCEPTION_SAVE - 2;
+    /** 磁盘缓存路径错误 */
+    public final static int DISK_EXCEPTION_PATH = DISK_EXCEPTION_SAVE - 3;
 
     @Override
     public String getInfo(int code) {
@@ -26,6 +28,9 @@ public class DiskExceptionCode extends ExceptionCode {
                     break;
                 case DISK_EXCEPTION_GET:
                     info = "本地数据获取失败";
+                    break;
+                case DISK_EXCEPTION_PATH:
+                    info = "缓存路径错误";
                     break;
             }
         }
