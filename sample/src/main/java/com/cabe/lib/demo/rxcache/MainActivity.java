@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.cabe.lib.cache.CacheSource;
 import com.cabe.lib.cache.CacheUseCase;
 import com.cabe.lib.cache.disk.DiskCacheManager;
 import com.cabe.lib.cache.http.RequestParams;
