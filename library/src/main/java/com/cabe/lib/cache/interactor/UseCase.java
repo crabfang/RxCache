@@ -53,10 +53,6 @@ public abstract class UseCase<T> {
         this.subscription = observable.subscribe(subscriber);
     }
 
-    public void execute(final ViewPresenter<T> presenter) {
-        execute(new DefaultSubscriber<>(presenter));
-    }
-
     public void unsubscribe() {
         if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();

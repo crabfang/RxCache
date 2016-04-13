@@ -1,5 +1,6 @@
 package com.cabe.lib.cache.interactor;
 
+import com.cabe.lib.cache.CacheSource;
 import com.cabe.lib.cache.exception.ExceptionCode;
 import com.cabe.lib.cache.exception.RxException;
 
@@ -10,13 +11,20 @@ import retrofit.RetrofitError;
  * Created by cabe on 16/4/12.
  */
 public class DefaultSubscriber<T> extends rx.Subscriber<T> {
+    public final static int REPOSITORY_DISK = 0;
+    public final static int REPOSITORY_HTTP = 1;
+
+    private CacheSource repository;
     private ViewPresenter<T> presenter;
-    public DefaultSubscriber(ViewPresenter<T> presenter) {
+    public DefaultSubscriber(CacheSource repository, ViewPresenter<T> presenter) {
+        this.repository = repository;
         this.presenter = presenter;
+    }
+    public DefaultSubscriber() {
     }
     @Override public void onCompleted() {
         if(presenter != null) {
-            presenter.complete();
+            presenter.complete(repository);
         }
     }
 
@@ -43,13 +51,13 @@ public class DefaultSubscriber<T> extends rx.Subscriber<T> {
             info = new ExceptionCode().getInfo(code);
         }
         if(presenter != null) {
-            presenter.error(code, info);
+            presenter.error(repository, code, info);
         }
     }
 
     @Override public void onNext(T t) {
         if(presenter != null) {
-            presenter.load(t);
+            presenter.load(repository, t);
         }
     }
 }

@@ -20,12 +20,14 @@ import rx.functions.Func1;
  * Created by cabe on 16/4/13.
  */
 public class CacheUseCase<T> extends UseCase<T> {
-    public static String DISK_CACHE_PATH = "/com.cabe.demo";
+    public static String DISK_CACHE_PATH = "";
     private DiskCacheManager manager;
     private RequestParams params = null;
     private String cachePath = DISK_CACHE_PATH;
     public CacheUseCase(TypeToken<T> typeT, RequestParams params) {
         super(typeT);
+        super.setExecutor(null);
+        super.setPostThread(null);
         this.params = params;
     }
 
@@ -34,7 +36,7 @@ public class CacheUseCase<T> extends UseCase<T> {
     }
 
     @Override
-    public Observable buildUseCaseObservable() {
+    public Observable<T> buildUseCaseObservable() {
         return buildDiskObservable();
     }
     public Observable<T> buildDiskObservable() {
@@ -61,54 +63,30 @@ public class CacheUseCase<T> extends UseCase<T> {
         });
     }
 
-    private DefaultSubscriber<T> createSubscriber(final ViewPresenter<T> presenter) {
-        DefaultSubscriber<T> subscriber;
-        if(presenter == null) {
-            subscriber = new DefaultSubscriber<>(null);
-        } else {
-            subscriber = new DefaultSubscriber<>(new ViewPresenter<T>() {
-                @Override
-                public void error(int code, String info) {
-                    presenter.error(code, info);
-                }
-                @Override
-                public void load(T data) {
-                    presenter.load(data);
-                }
-                @Override
-                public void complete() {
-                    presenter.complete();
-                }
-            });
-        }
-        return subscriber;
-    }
-
-    @Override
     public void execute(final ViewPresenter<T> presenter) {
         if(presenter == null) {
-            super.execute(new DefaultSubscriber<T>(null){
+            super.execute(new DefaultSubscriber<T>(){
                 @Override
                 public void onCompleted() {
                     executeHttp(null);
                 }
             });
         } else {
-            super.execute(new ViewPresenter<T>(){
+            super.execute(new DefaultSubscriber<>(CacheSource.DISK, new ViewPresenter<T>(){
                 @Override
-                public void error(int code, String info) {
-                    presenter.error(code, info);
+                public void error(CacheSource source, int code, String info) {
+                    presenter.error(source, code, info);
                 }
                 @Override
-                public void load(T data) {
-                    presenter.load(data);
+                public void load(CacheSource source, T data) {
+                    presenter.load(source, data);
                 }
                 @Override
-                public void complete() {
-                    presenter.complete();
+                public void complete(CacheSource source) {
+                    presenter.complete(source);
                     executeHttp(presenter);
                 }
-            });
+            }));
         }
     }
 
@@ -118,24 +96,24 @@ public class CacheUseCase<T> extends UseCase<T> {
             public Observable<T> buildUseCaseObservable() {
                 return buildHttpObservable();
             }
-        }.execute(new DefaultSubscriber<T>(new ViewPresenter<T>() {
+        }.execute(new DefaultSubscriber<>(CacheSource.HTTP, new ViewPresenter<T>() {
             @Override
-            public void error(int code, String info) {
+            public void error(CacheSource source, int code, String info) {
                 if(presenter != null) {
-                    presenter.error(code, info);
+                    presenter.error(source, code, info);
                 }
             }
             @Override
-            public void load(T data) {
+            public void load(CacheSource source, T data) {
                 manager.put(getTypeToken(), data);
                 if(presenter != null) {
-                    presenter.load(data);
+                    presenter.load(source, data);
                 }
             }
             @Override
-            public void complete() {
+            public void complete(CacheSource source) {
                 if(presenter != null) {
-                    presenter.complete();
+                    presenter.complete(source);
                 }
             }
         }));
