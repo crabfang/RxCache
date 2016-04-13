@@ -15,7 +15,7 @@ dependencies {
         StringHttpFactory.logLevel = RestAdapter.LogLevel.NONE;
         CacheUseCase.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
         
-```java
+```
 
 ### Usage
 ```java
@@ -37,4 +37,4 @@ dependencies {
             }
         });
         
-```java
+```
