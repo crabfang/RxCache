@@ -9,7 +9,7 @@ import java.util.Map;
 public class RequestParams {
     /** https://www.github.com/crabfang/RxCache?key1=val1&key2=val2  */
     /**
-     * Http请求的head参数<br/>
+     * Http请求的head参数<br>
      * 比如 cookies
      **/
     public Map<String, String> head;
@@ -23,7 +23,7 @@ public class RequestParams {
      **/
     public Map<String, String> body;
     /**
-     * 请求地址的host地址<br/>
+     * 请求地址的host地址<br>
      * 比如 https://www.github.com
      **/
     public String host;

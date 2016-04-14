@@ -1,7 +1,7 @@
 package com.cabe.lib.cache.exception;
 
 /**
- * RxCache Default Exception Code<br/>
+ * RxCache Default Exception Code<br>
  * Created by cabe on 16/4/12.
  */
 public class ExceptionCode {

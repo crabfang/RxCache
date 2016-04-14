@@ -3,7 +3,7 @@ package com.cabe.lib.cache;
 import com.google.gson.reflect.TypeToken;
 
 /**
- * 磁盘缓存相关接口<br/>
+ * 磁盘缓存相关接口<br>
  * Created by cabe on 16/4/14.
  */
 public interface DiskCacheRepository {

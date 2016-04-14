@@ -16,8 +16,8 @@ import java.security.NoSuchAlgorithmException;
 import rx.android.BuildConfig;
 
 /**
- * 磁盘缓存的实现类<br/>
- * 使用DiskLruCache进行数据处理<br/>
+ * 磁盘缓存的实现类<br>
+ * 使用DiskLruCache进行数据处理<br>
  * Created by cabe on 16/4/12.
  */
 public class DiskCacheManager implements DiskCacheRepository {

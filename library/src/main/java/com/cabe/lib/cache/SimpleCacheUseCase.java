@@ -14,15 +14,15 @@ import rx.Observable;
 import rx.Subscriber;
 
 /**
- * 缓存获取用例实现<br/>
- * 主要通过<br/>
- * {@link com.jakewharton.disklrucache.DiskLruCache} 进行本地缓存<br/>
- * {@link retrofit.RestAdapter} 进行网络缓存<br/>
- * 也可通过<br/>
- * {@link SimpleCacheUseCase#setDiskManager(DiskCacheRepository)}<br/>
- * 以及<br/>
- * {@link SimpleCacheUseCase#setHttpManager(HttpCacheRepository)}<br/>
- * 两个方法来切换实现方式<br/>
+ * 缓存获取用例实现<br>
+ * 主要通过<br>
+ * {@link com.jakewharton.disklrucache.DiskLruCache} 进行本地缓存<br>
+ * {@link retrofit.RestAdapter} 进行网络缓存<br>
+ * 也可通过<br>
+ * {@link SimpleCacheUseCase#setDiskManager(DiskCacheRepository)}<br>
+ * 以及<br>
+ * {@link SimpleCacheUseCase#setHttpManager(HttpCacheRepository)}<br>
+ * 两个方法来切换实现方式<br>
  * Created by cabe on 16/4/13.
  */
 public class SimpleCacheUseCase<T> extends AbstractCacheUseCase<T> {

@@ -22,7 +22,7 @@ import retrofit.http.QueryMap;
 import rx.Observable;
 
 /**
- * 简单的Retrofit实现<br/>
+ * 简单的Retrofit实现<br>
  * Created by cabe on 16/4/12.
  */
 public class StringHttpFactory {
