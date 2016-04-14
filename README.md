@@ -13,7 +13,7 @@ dependencies {
 ```java
 
         StringHttpFactory.logLevel = RestAdapter.LogLevel.NONE;
-        CacheUseCase.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
+        DiskCacheManager.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
         
 ```
 
@@ -107,6 +107,6 @@ dependencies {
 
 ## Implements
 
-    create a class DiskCacheManager implements DiskCacheRepository;<br/>
-    create a class HttpCacheManager implements HttpCacheRepository;<br/>
-    create a class SimpleCacheUseCase extends AbstractCacheUseCase;<br/>
+    create a class DiskCacheManager implements DiskCacheRepository;
+    create a class HttpCacheManager implements HttpCacheRepository;
+    create a class SimpleCacheUseCase extends AbstractCacheUseCase;
