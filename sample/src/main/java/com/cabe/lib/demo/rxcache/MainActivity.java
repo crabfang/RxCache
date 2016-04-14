@@ -5,8 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.cabe.lib.cache.AbstractCacheUseCase;
 import com.cabe.lib.cache.CacheSource;
-import com.cabe.lib.cache.CacheUseCase;
+import com.cabe.lib.cache.SimpleCacheUseCase;
 import com.cabe.lib.cache.disk.DiskCacheManager;
 import com.cabe.lib.cache.http.RequestParams;
 import com.cabe.lib.cache.http.StringHttpFactory;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         StringHttpFactory.logLevel = RestAdapter.LogLevel.NONE;
-        CacheUseCase.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
+        DiskCacheManager.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
     }
 
     public void clickHttp(View v) {
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         params.host = "https://www.github.com";
         params.path = "crabfang/RxCache";
 
-        CacheUseCase<GitHubBean> useCase = new CacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
+        AbstractCacheUseCase<GitHubBean> useCase = new SimpleCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
         useCase.execute(new ViewPresenter<GitHubBean>() {
             @Override
             public void error(CacheSource from, int code, String info) {
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     public void clickDisk(View v) {
         Log.w(TAG, "click disk");
 
-        DiskCacheManager cacheManager = new DiskCacheManager(CacheUseCase.DISK_CACHE_PATH);
+        DiskCacheManager cacheManager = new DiskCacheManager();
 
         TypeToken<List<Person>> typeToken = new TypeToken<List<Person>>(){};
         if(!cacheManager.exits(typeToken)) {
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             cacheManager.put(typeToken, list);
         }
 
-        CacheUseCase<List<Person>> useCase = new CacheUseCase<List<Person>>(new TypeToken<List<Person>>(){}, null){
+        SimpleCacheUseCase<List<Person>> useCase = new SimpleCacheUseCase<List<Person>>(new TypeToken<List<Person>>(){}, null){
             @Override
             public Observable<List<Person>> buildDiskObservable() {
                 return super.buildDiskObservable();

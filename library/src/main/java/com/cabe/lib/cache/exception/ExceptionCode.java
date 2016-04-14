@@ -5,11 +5,17 @@ package com.cabe.lib.cache.exception;
  * Created by cabe on 16/4/12.
  */
 public class ExceptionCode {
-    public static int RX_EXCEPTION_DEFAULT = -100;
+    public final static int RX_EXCEPTION_DEFAULT = -100;
+    public final static int RX_EXCEPTION_TYPE_UNKNOWN = -101;
     public String getInfo(int code) {
         String info = "";
-        if(code == RX_EXCEPTION_DEFAULT) {
-            info = "未知错误";
+        switch (code) {
+            case RX_EXCEPTION_DEFAULT:
+                info = "未知错误";
+                break;
+            case RX_EXCEPTION_TYPE_UNKNOWN:
+                info = "未知转换类型";
+                break;
         }
         return info;
     }

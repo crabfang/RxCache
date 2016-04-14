@@ -2,6 +2,7 @@ package com.cabe.lib.cache.disk;
 
 import android.util.Log;
 
+import com.cabe.lib.cache.DiskCacheRepository;
 import com.cabe.lib.cache.exception.DiskExceptionCode;
 import com.cabe.lib.cache.exception.RxException;
 import com.google.gson.Gson;
@@ -18,7 +19,8 @@ import rx.android.BuildConfig;
  *
  * Created by cabe on 16/4/12.
  */
-public class DiskCacheManager {
+public class DiskCacheManager implements DiskCacheRepository {
+    public static String DISK_CACHE_PATH = "";
     private static DiskLruCache cache;
 
     public DiskCacheManager(String cachePath){
@@ -34,6 +36,9 @@ public class DiskCacheManager {
                 e.printStackTrace();
             }
         }
+    }
+    public DiskCacheManager() {
+        this(DISK_CACHE_PATH);
     }
     private String hashKeyForDisk(String key) {
         String cacheKey;
