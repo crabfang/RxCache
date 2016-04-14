@@ -8,7 +8,12 @@ import rx.Observable;
 import rx.Subscriber;
 
 /**
- * 缓存用例抽象类
+ * 缓存用例抽象类<br/>
+ * 进行本地以及远程二级缓存获取<br/>
+ * 需实现<br/>
+ * {@link AbstractCacheUseCase#buildDiskObservable()} <br/>
+ * {@link AbstractCacheUseCase#buildHttpObservable} <br/>
+ * 两个方法<br/>
  * Created by cabe on 16/4/14.
  */
 public abstract class AbstractCacheUseCase<T> extends UseCase<T> {

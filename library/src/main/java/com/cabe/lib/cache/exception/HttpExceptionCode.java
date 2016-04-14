@@ -1,7 +1,7 @@
 package com.cabe.lib.cache.exception;
 
 /**
- * Http Exception Code
+ * Http Exception Code<br/>
  * Created by cabe on 16/4/12.
  */
 public class HttpExceptionCode extends ExceptionCode {
