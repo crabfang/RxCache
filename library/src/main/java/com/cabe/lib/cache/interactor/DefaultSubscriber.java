@@ -11,16 +11,12 @@ import retrofit.RetrofitError;
  * Created by cabe on 16/4/12.
  */
 public class DefaultSubscriber<T> extends rx.Subscriber<T> {
-    public final static int REPOSITORY_DISK = 0;
-    public final static int REPOSITORY_HTTP = 1;
 
     private CacheSource from;
     private ViewPresenter<T> presenter;
     public DefaultSubscriber(CacheSource from, ViewPresenter<T> presenter) {
         this.from = from;
         this.presenter = presenter;
-    }
-    public DefaultSubscriber() {
     }
     @Override public void onCompleted() {
         if(presenter != null) {

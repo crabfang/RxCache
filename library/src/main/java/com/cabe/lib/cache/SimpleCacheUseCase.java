@@ -30,8 +30,8 @@ public class SimpleCacheUseCase<T> extends AbstractCacheUseCase<T> {
     private HttpCacheRepository<T> httpManager;
     private RequestParams params = null;
 
-    public SimpleCacheUseCase(TypeToken<T> typeT, RequestParams params) {
-        super(typeT);
+    public SimpleCacheUseCase(TypeToken<T> typeT, RequestParams params, CacheMethod cacheMethod) {
+        super(typeT, cacheMethod);
         //DiskCache在主线程调用
         super.setExecutor(null);
         super.setPostThread(null);
@@ -43,6 +43,10 @@ public class SimpleCacheUseCase<T> extends AbstractCacheUseCase<T> {
             diskManager = new DiskCacheManager(diskCachePath);
         }
         httpManager = new HttpCacheManager<>(getTypeToken());
+    }
+
+    public SimpleCacheUseCase(TypeToken<T> typeT, RequestParams requestParams) {
+        this(typeT, requestParams, CacheMethod.BOTH);
     }
 
     public void setDiskManager(DiskCacheRepository diskManager) {
@@ -75,7 +79,7 @@ public class SimpleCacheUseCase<T> extends AbstractCacheUseCase<T> {
 
     @Override
     protected Subscriber<T> getSubscriber(CacheSource from, final ViewPresenter<T> presenter) {
-        return new DefaultSubscriber<>(CacheSource.HTTP, new ViewPresenter<T>() {
+        return new DefaultSubscriber<>(from, new ViewPresenter<T>() {
             @Override
             public void error(CacheSource from, int code, String info) {
                 if(presenter != null) {
@@ -84,8 +88,10 @@ public class SimpleCacheUseCase<T> extends AbstractCacheUseCase<T> {
             }
             @Override
             public void load(CacheSource from, T data) {
-                if(diskManager != null && from == CacheSource.HTTP) {
-                    diskManager.put(getTypeToken(), data);
+                if(getCacheMethod() == CacheMethod.BOTH) {
+                    if(diskManager != null && from == CacheSource.HTTP) {
+                        diskManager.put(getTypeToken(), data);
+                    }
                 }
                 if(presenter != null) {
                     presenter.load(from, data);
@@ -96,7 +102,7 @@ public class SimpleCacheUseCase<T> extends AbstractCacheUseCase<T> {
                 if(presenter != null) {
                     presenter.complete(from);
                 }
-                if(!isDiskOnly()) {
+                if(from == CacheSource.DISK && getCacheMethod() == CacheMethod.BOTH) {
                     executeHttp(presenter);
                 }
             }

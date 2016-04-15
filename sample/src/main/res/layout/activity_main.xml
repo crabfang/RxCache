@@ -11,12 +11,12 @@
     tools:context="com.cabe.lib.demo.rxcache.MainActivity">
 
     <Button
-        android:id="@+id/activity_main_btn_http"
+        android:id="@+id/activity_main_btn_both"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="10dp"
-        android:onClick="clickHttp"
-        android:text="click http" />
+        android:onClick="clickBoth"
+        android:text="click both" />
 
     <Button
         android:id="@+id/activity_main_btn_disk"
@@ -25,5 +25,13 @@
         android:layout_marginTop="10dp"
         android:onClick="clickDisk"
         android:text="click disk" />
+
+    <Button
+        android:id="@+id/activity_main_btn_http"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:onClick="clickHttp"
+        android:text="click http" />
 
 </LinearLayout>

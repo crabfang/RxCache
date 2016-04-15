@@ -17,23 +17,20 @@ import rx.Subscriber;
  * Created by cabe on 16/4/14.
  */
 public abstract class AbstractCacheUseCase<T> extends UseCase<T> {
-    private boolean diskOnly = false;
+    private CacheMethod cacheMethod = CacheMethod.BOTH;
 
-    public AbstractCacheUseCase(TypeToken<T> typeT) {
+    public AbstractCacheUseCase(TypeToken<T> typeT, CacheMethod cacheMethod) {
         super(typeT);
+        this.cacheMethod = cacheMethod;
     }
 
-    public void setDiskOnly(boolean diskOnly) {
-        this.diskOnly = diskOnly;
-    }
-
-    public boolean isDiskOnly() {
-        return diskOnly;
+    public CacheMethod getCacheMethod() {
+        return cacheMethod;
     }
 
     @Override
     public Observable<T> buildUseCaseObservable() {
-        return buildDiskObservable();
+        return getCacheMethod() != CacheMethod.HTTP ? buildDiskObservable() : buildHttpObservable();
     }
 
     public abstract Observable<T> buildDiskObservable();
@@ -43,7 +40,8 @@ public abstract class AbstractCacheUseCase<T> extends UseCase<T> {
     protected abstract Subscriber<T> getSubscriber(CacheSource from, ViewPresenter<T> presenter);
 
     public void execute(final ViewPresenter<T> presenter) {
-        super.execute(getSubscriber(CacheSource.DISK, presenter));
+        CacheSource source = cacheMethod == CacheMethod.HTTP ? CacheSource.HTTP : CacheSource.DISK;
+        super.execute(getSubscriber(source, presenter));
     }
 
     protected void executeHttp(final ViewPresenter<T> presenter) {
