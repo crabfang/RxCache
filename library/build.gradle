@@ -40,7 +40,5 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
 }
 
-println 'apply mave.gradle'
 apply from: 'https://raw.githubusercontent.com/crabfang/BintrayGradle/master/maven.gradle'
-println 'apply bintray.gradle'
 apply from: 'https://raw.githubusercontent.com/crabfang/BintrayGradle/master/bintray.gradle'
