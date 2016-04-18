@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * 缓存用例抽象类<br>
@@ -18,6 +19,7 @@ import rx.Subscriber;
  */
 public abstract class AbstractCacheUseCase<T> extends UseCase<T> {
     private CacheMethod cacheMethod = CacheMethod.BOTH;
+    private CompositeSubscription cs = new CompositeSubscription();
 
     public AbstractCacheUseCase(TypeToken<T> typeT, CacheMethod cacheMethod) {
         super(typeT);
@@ -41,15 +43,21 @@ public abstract class AbstractCacheUseCase<T> extends UseCase<T> {
 
     public void execute(final ViewPresenter<T> presenter) {
         CacheSource source = cacheMethod == CacheMethod.HTTP ? CacheSource.HTTP : CacheSource.DISK;
-        super.execute(getSubscriber(source, presenter));
+        cs.add(super.execute(getSubscriber(source, presenter)));
     }
 
     protected void executeHttp(final ViewPresenter<T> presenter) {
-        new UseCase<T>(getTypeToken()){
+        UseCase<T> useCase = new UseCase<T>(getTypeToken()){
             @Override
             public Observable<T> buildUseCaseObservable() {
                 return buildHttpObservable();
             }
-        }.execute(getSubscriber(CacheSource.HTTP, presenter));
+        };
+        cs.add(useCase.execute(getSubscriber(CacheSource.HTTP, presenter)));
+    }
+
+    @Override
+    public void unsubscribe() {
+        cs.unsubscribe();
     }
 }

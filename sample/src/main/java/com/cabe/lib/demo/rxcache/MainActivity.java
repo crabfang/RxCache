@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         Log.w(TAG, "click both");
 
         RequestParams params = new RequestParams();
-        params.host = "https://www.u51.com/51rp/rpdservice";
+        params.host = "https://www.cabe.com";
         params.path = "appLoadingImage.htm";
         Map<String, String> query = new HashMap<>();
         query.put("loadingImageType", "android-large");
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         Log.w(TAG, "click http");
 
         RequestParams params = new RequestParams();
-        params.host = "https://www.u51.com/51rp/rpdservice";
+        params.host = "https://www.cabe.com";
         params.path = "appLoadingImage.htm";
         Map<String, String> query = new HashMap<>();
         query.put("loadingImageType", "android-large");

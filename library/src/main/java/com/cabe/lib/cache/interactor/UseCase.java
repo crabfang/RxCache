@@ -42,7 +42,7 @@ public abstract class UseCase<T> {
         this.postThread = postThread;
     }
 
-    public void execute(Subscriber<T> subscriber) {
+    public Subscription execute(Subscriber<T> subscriber) {
         Observable<T> observable = this.buildUseCaseObservable();
         if(executor != null) {
             observable.subscribeOn(Schedulers.from(executor));
@@ -51,6 +51,7 @@ public abstract class UseCase<T> {
             observable.observeOn(postThread.getScheduler());
         }
         this.subscription = observable.subscribe(subscriber);
+        return subscriber;
     }
 
     public void unsubscribe() {
