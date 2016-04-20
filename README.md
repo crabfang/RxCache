@@ -65,23 +65,21 @@ dependencies {
 ```java
 
         public abstract class AbstractCacheUseCase<T> extends UseCase<T> {
-            private boolean diskOnly = false;
+            private CacheMethod cacheMethod = CacheMethod.BOTH;
+            private CompositeSubscription cs = new CompositeSubscription();
         
-            public AbstractCacheUseCase(TypeToken<T> typeT) {
+            public AbstractCacheUseCase(TypeToken<T> typeT, CacheMethod cacheMethod) {
                 super(typeT);
+                this.cacheMethod = cacheMethod;
             }
         
-            public void setDiskOnly(boolean diskOnly) {
-                this.diskOnly = diskOnly;
-            }
-        
-            public boolean isDiskOnly() {
-                return diskOnly;
+            public CacheMethod getCacheMethod() {
+                return cacheMethod;
             }
         
             @Override
             public Observable<T> buildUseCaseObservable() {
-                return buildDiskObservable();
+                return getCacheMethod() != CacheMethod.HTTP ? buildDiskObservable() : buildHttpObservable();
             }
         
             public abstract Observable<T> buildDiskObservable();
@@ -91,16 +89,23 @@ dependencies {
             protected abstract Subscriber<T> getSubscriber(CacheSource from, ViewPresenter<T> presenter);
         
             public void execute(final ViewPresenter<T> presenter) {
-                super.execute(getSubscriber(CacheSource.DISK, presenter));
+                CacheSource source = cacheMethod == CacheMethod.HTTP ? CacheSource.HTTP : CacheSource.DISK;
+                cs.add(super.execute(getSubscriber(source, presenter)));
             }
         
             protected void executeHttp(final ViewPresenter<T> presenter) {
-                new UseCase<T>(getTypeToken()){
+                UseCase<T> useCase = new UseCase<T>(getTypeToken()){
                     @Override
                     public Observable<T> buildUseCaseObservable() {
                         return buildHttpObservable();
                     }
-                }.execute(getSubscriber(CacheSource.HTTP, presenter));
+                };
+                cs.add(useCase.execute(getSubscriber(CacheSource.HTTP, presenter)));
+            }
+        
+            @Override
+            public void unsubscribe() {
+                cs.unsubscribe();
             }
         }
 ```
