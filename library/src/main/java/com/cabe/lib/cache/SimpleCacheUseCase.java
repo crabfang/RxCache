@@ -40,9 +40,11 @@ public class SimpleCacheUseCase<T> extends AbstractCacheUseCase<T> {
 
         String diskCachePath = DiskCacheManager.DISK_CACHE_PATH;
         if(diskCachePath != null && !diskCachePath.equals("")) {
-            diskManager = new DiskCacheManager(diskCachePath);
+            DiskCacheManager diskManager = new DiskCacheManager(diskCachePath);
+            setDiskManager(diskManager);
         }
-        httpManager = new HttpCacheManager<>(getTypeToken());
+        HttpCacheManager<T> httpManager = new HttpCacheManager<>(getTypeToken());
+        setHttpManager(httpManager);
     }
 
     public SimpleCacheUseCase(TypeToken<T> typeT, RequestParams requestParams) {
