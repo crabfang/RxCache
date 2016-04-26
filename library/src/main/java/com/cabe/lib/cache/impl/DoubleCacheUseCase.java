@@ -1,5 +1,9 @@
-package com.cabe.lib.cache;
+package com.cabe.lib.cache.impl;
 
+import com.cabe.lib.cache.AbstractCacheUseCase;
+import com.cabe.lib.cache.CacheMethod;
+import com.cabe.lib.cache.CacheSource;
+import com.cabe.lib.cache.DiskCacheRepository;
 import com.cabe.lib.cache.disk.DiskCacheManager;
 import com.cabe.lib.cache.exception.DiskExceptionCode;
 import com.cabe.lib.cache.exception.RxException;
@@ -19,18 +23,18 @@ import rx.Subscriber;
  * {@link com.jakewharton.disklrucache.DiskLruCache} 进行本地缓存<br>
  * {@link retrofit.RestAdapter} 进行网络缓存<br>
  * 也可通过<br>
- * {@link SimpleCacheUseCase#setDiskManager(DiskCacheRepository)}<br>
+ * {@link DoubleCacheUseCase#setDiskManager(DiskCacheRepository)}<br>
  * 以及<br>
- * {@link SimpleCacheUseCase#setHttpManager(HttpCacheRepository)}<br>
+ * {@link DoubleCacheUseCase#setHttpManager(HttpCacheRepository)}<br>
  * 两个方法来切换实现方式<br>
  * Created by cabe on 16/4/13.
  */
-public class SimpleCacheUseCase<T> extends AbstractCacheUseCase<T> {
+public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
     private DiskCacheRepository diskManager;
     private HttpCacheRepository<T> httpManager;
     private RequestParams params = null;
 
-    public SimpleCacheUseCase(TypeToken<T> typeT, RequestParams params, CacheMethod cacheMethod) {
+    public DoubleCacheUseCase(TypeToken<T> typeT, RequestParams params, CacheMethod cacheMethod) {
         super(typeT, cacheMethod);
         //DiskCache在主线程调用
         super.setExecutor(null);
@@ -47,7 +51,7 @@ public class SimpleCacheUseCase<T> extends AbstractCacheUseCase<T> {
         setHttpManager(httpManager);
     }
 
-    public SimpleCacheUseCase(TypeToken<T> typeT, RequestParams requestParams) {
+    public DoubleCacheUseCase(TypeToken<T> typeT, RequestParams requestParams) {
         this(typeT, requestParams, CacheMethod.BOTH);
     }
 

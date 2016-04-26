@@ -7,10 +7,10 @@ import android.view.View;
 
 import com.cabe.lib.cache.AbstractCacheUseCase;
 import com.cabe.lib.cache.CacheMethod;
-import com.cabe.lib.cache.SimpleCacheUseCase;
 import com.cabe.lib.cache.disk.DiskCacheManager;
 import com.cabe.lib.cache.http.RequestParams;
 import com.cabe.lib.cache.http.StringHttpFactory;
+import com.cabe.lib.cache.impl.DoubleCacheUseCase;
 import com.cabe.lib.cache.interactor.impl.SimpleViewPresenter;
 import com.google.gson.reflect.TypeToken;
 
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         query.put("loadingImageType", "android-large");
         params.query = query;
 
-        AbstractCacheUseCase<GitHubBean> useCase = new SimpleCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
+        AbstractCacheUseCase<GitHubBean> useCase = new DoubleCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
         useCase.execute(new SimpleViewPresenter<GitHubBean>());
     }
 
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             cacheManager.put(typeToken, list);
         }
 
-        SimpleCacheUseCase<List<Person>> useCase = new SimpleCacheUseCase<>(new TypeToken<List<Person>>(){}, null, CacheMethod.DISK);
+        DoubleCacheUseCase<List<Person>> useCase = new DoubleCacheUseCase<>(new TypeToken<List<Person>>(){}, null, CacheMethod.DISK);
         useCase.execute(new SimpleViewPresenter<List<Person>>());
     }
 
@@ -79,7 +79,29 @@ public class MainActivity extends AppCompatActivity {
         query.put("loadingImageType", "android-large");
         params.query = query;
 
-        AbstractCacheUseCase<GitHubBean> useCase = new SimpleCacheUseCase<>(new TypeToken<GitHubBean>(){}, params, CacheMethod.HTTP);
+        AbstractCacheUseCase<GitHubBean> useCase = new DoubleCacheUseCase<>(new TypeToken<GitHubBean>(){}, params, CacheMethod.HTTP);
         useCase.execute(new SimpleViewPresenter<GitHubBean>());
+    }
+
+    private class Person {
+        public String name;
+        public int age;
+        public void setAge(int age) {
+            this.age = age;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        @Override
+        public String toString() {
+            return name + "_" + age;
+        }
+    }
+
+    private class GitHubBean {
+        public String str;
+        public void setStr(String str) {
+            this.str = str;
+        }
     }
 }
