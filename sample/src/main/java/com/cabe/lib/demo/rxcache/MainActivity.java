@@ -6,11 +6,12 @@ import android.util.Log;
 import android.view.View;
 
 import com.cabe.lib.cache.AbstractCacheUseCase;
-import com.cabe.lib.cache.CacheMethod;
 import com.cabe.lib.cache.disk.DiskCacheManager;
 import com.cabe.lib.cache.http.RequestParams;
 import com.cabe.lib.cache.http.StringHttpFactory;
+import com.cabe.lib.cache.impl.DiskCacheUseCase;
 import com.cabe.lib.cache.impl.DoubleCacheUseCase;
+import com.cabe.lib.cache.impl.HttpCacheUseCase;
 import com.cabe.lib.cache.interactor.impl.SimpleViewPresenter;
 import com.google.gson.reflect.TypeToken;
 
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             cacheManager.put(typeToken, list);
         }
 
-        DoubleCacheUseCase<List<Person>> useCase = new DoubleCacheUseCase<>(new TypeToken<List<Person>>(){}, null, CacheMethod.DISK);
+        AbstractCacheUseCase<List<Person>> useCase = new DiskCacheUseCase<>(new TypeToken<List<Person>>(){});
         useCase.execute(new SimpleViewPresenter<List<Person>>());
     }
 
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         query.put("loadingImageType", "android-large");
         params.query = query;
 
-        AbstractCacheUseCase<GitHubBean> useCase = new DoubleCacheUseCase<>(new TypeToken<GitHubBean>(){}, params, CacheMethod.HTTP);
+        AbstractCacheUseCase<GitHubBean> useCase = new HttpCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
         useCase.execute(new SimpleViewPresenter<GitHubBean>());
     }
 
