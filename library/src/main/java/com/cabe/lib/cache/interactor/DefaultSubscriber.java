@@ -48,6 +48,7 @@ public class DefaultSubscriber<T> extends rx.Subscriber<T> {
         }
         if(presenter != null) {
             presenter.error(from, code, info);
+            presenter.complete(from);
         }
     }
 
