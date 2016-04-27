@@ -44,7 +44,12 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
 
         String diskCachePath = DiskCacheManager.DISK_CACHE_PATH;
         if(diskCachePath != null && !diskCachePath.equals("")) {
-            DiskCacheManager diskManager = new DiskCacheManager(diskCachePath);
+            DiskCacheManager diskManager = null;
+            try {
+                diskManager = new DiskCacheManager(diskCachePath);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             setDiskManager(diskManager);
         }
         HttpCacheManager<T> httpManager = new HttpCacheManager<>(getTypeToken());
@@ -63,14 +68,23 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
         this.httpManager = httpManager;
     }
 
+    public boolean saveCacheDisk(T data) {
+        boolean saveResult = false;
+        if(diskManager != null) {
+            saveResult = diskManager.put(getTypeToken(), data);
+        }
+        return saveResult;
+    }
+
     @Override
     public Observable<T> buildDiskObservable() {
-        if(diskManager == null) {
-            throw RxException.build(DiskExceptionCode.DISK_EXCEPTION_PATH, null);
-        }
         return Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {
+                if(diskManager == null) {
+                    throw RxException.build(DiskExceptionCode.DISK_EXCEPTION_PATH, null);
+                }
+
                 T data = diskManager.get(getTypeToken());
                 subscriber.onNext(data);
                 subscriber.onCompleted();
@@ -95,8 +109,8 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
             @Override
             public void load(CacheSource from, T data) {
                 if(getCacheMethod() == CacheMethod.BOTH) {
-                    if(diskManager != null && from == CacheSource.HTTP) {
-                        diskManager.put(getTypeToken(), data);
+                    if(from == CacheSource.HTTP) {
+                        saveCacheDisk(data);
                     }
                 }
                 if(presenter != null) {

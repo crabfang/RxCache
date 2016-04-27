@@ -13,6 +13,8 @@ public class DiskExceptionCode extends ExceptionCode {
     public final static int DISK_EXCEPTION_GET = DISK_EXCEPTION_SAVE - 2;
     /** 磁盘缓存路径错误 */
     public final static int DISK_EXCEPTION_PATH = DISK_EXCEPTION_SAVE - 3;
+    /** 磁盘缓存类型错误 */
+    public final static int DISK_EXCEPTION_TYPE = DISK_EXCEPTION_SAVE - 4;
 
     @Override
     public String getInfo(int code) {
@@ -31,6 +33,9 @@ public class DiskExceptionCode extends ExceptionCode {
                     break;
                 case DISK_EXCEPTION_PATH:
                     info = "缓存路径错误";
+                    break;
+                case DISK_EXCEPTION_TYPE:
+                    info = "缓存类型错误";
                     break;
             }
         }

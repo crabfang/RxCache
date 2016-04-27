@@ -24,21 +24,17 @@ public class DiskCacheManager implements DiskCacheRepository {
     public static String DISK_CACHE_PATH = "";
     private static DiskLruCache cache;
 
-    public DiskCacheManager(String cachePath){
+    public DiskCacheManager(String cachePath) throws Exception {
         if(cache == null) {
-            try {
-                File cacheDir = new File(cachePath);
-                if(!cacheDir.exists()) {
-                    boolean result = cacheDir.mkdirs();
-                    Log.d("DiskCacheManager", "mkdirs " + result);
-                }
-                cache = DiskLruCache.open(cacheDir, BuildConfig.VERSION_CODE, 1, 1024 * 1024 * 10);
-            } catch (Exception e) {
-                e.printStackTrace();
+            File cacheDir = new File(cachePath);
+            if(!cacheDir.exists()) {
+                boolean result = cacheDir.mkdirs();
+                Log.d("DiskCacheManager", "mkdirs " + result);
             }
+            cache = DiskLruCache.open(cacheDir, BuildConfig.VERSION_CODE, 1, 1024 * 1024 * 10);
         }
     }
-    public DiskCacheManager() {
+    public DiskCacheManager() throws Exception {
         this(DISK_CACHE_PATH);
     }
     private String hashKeyForDisk(String key) {
@@ -85,19 +81,24 @@ public class DiskCacheManager implements DiskCacheRepository {
             } else {
                 return null;
             }
-        }catch(Exception ignored){
-            throw RxException.build(DiskExceptionCode.DISK_EXCEPTION_GET, ignored);
+        }catch(Exception e){
+            throw RxException.build(DiskExceptionCode.DISK_EXCEPTION_GET, e);
         }
     }
     public synchronized <T> boolean put(TypeToken<T> typeToken, T obj){
-        String json = new Gson().toJson(obj);
+        if(typeToken == null) {
+            throw RxException.build(DiskExceptionCode.DISK_EXCEPTION_TYPE, null);
+        }
         try {
-            DiskLruCache.Editor editor = cache.edit(getTypeTokenKey(typeToken));
-            editor.set(0, json);
-            editor.commit();
-            return true;
+            if(obj != null) {
+                String json = new Gson().toJson(obj);
+                DiskLruCache.Editor editor = cache.edit(getTypeTokenKey(typeToken));
+                editor.set(0, json);
+                editor.commit();
+            }
         } catch (Exception e) {
             throw RxException.build(DiskExceptionCode.DISK_EXCEPTION_SAVE, e);
         }
+        return true;
     }
 }
