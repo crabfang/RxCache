@@ -1,10 +1,10 @@
-<img src="./resource/Repository.png"  width="564" height="315"/>
+<img src="./resource/Repository.png"  width="600" height="673"/>
 
 ## Integration
 ``` xml
 
 dependencies {
-    compile 'com.cabe.lib:RxCache:1.0.2'
+    compile 'com.cabe.lib:RxCache:1.0.3'
 }
 
 ``` 
