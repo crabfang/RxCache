@@ -16,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func1;
 
 /**
  * 缓存获取用例实现<br>
@@ -33,6 +34,16 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
     private DiskCacheRepository diskManager;
     private HttpCacheRepository<T> httpManager;
     private RequestParams params = null;
+
+    /**
+     * 使用observable.flatMap(Fun1)来做数据转换<br>
+     * 而不是用observable.compose(Transformer)的原因是<br>
+     * Observable.Transformer().call(Observable tObservable)<br>
+     * 参数tObservable有可能被忽略从而导致之前的操作流(tObservable)不被执行
+     *
+     */
+    private Func1<T, Observable<T>> httpTransformer;
+    private Func1<T, Observable<T>> diskTransformer;
 
     public DoubleCacheUseCase(TypeToken<T> typeT, RequestParams params, CacheMethod cacheMethod) {
         super(typeT, cacheMethod);
@@ -68,6 +79,14 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
         this.httpManager = httpManager;
     }
 
+    public void setDiskTransformer(Func1<T, Observable<T>> transformer) {
+        this.diskTransformer = transformer;
+    }
+
+    public void setHttpTransformer(Func1<T, Observable<T>> transformer) {
+        this.httpTransformer = transformer;
+    }
+
     public DiskCacheRepository getDiskRepository() {
         return diskManager;
     }
@@ -86,7 +105,7 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
 
     @Override
     public Observable<T> buildDiskObservable() {
-        return Observable.create(new Observable.OnSubscribe<T>() {
+        Observable<T> observable = Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {
                 if(diskManager == null) {
@@ -98,11 +117,20 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
                 subscriber.onCompleted();
             }
         });
+        if(diskTransformer != null) {
+            observable = observable.flatMap(diskTransformer);
+        }
+        return observable;
     }
 
     @Override
     public Observable<T> buildHttpObservable() {
-        return httpManager.getHttpObservable(params);
+        Observable<T> observable = httpManager.getHttpObservable(params);
+        if(httpTransformer != null) {
+            //这里使用flatMap而不是compose的原因是Observable.Transformer可能导致操作流被打断
+            observable = observable.flatMap(httpTransformer);
+        }
+        return observable;
     }
 
     @Override

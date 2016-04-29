@@ -31,7 +31,7 @@ public class RequestParams {
      * 请求地址的详细地址
      * 比如 crabfang/RxCache
      **/
-    public String path;
+    public String path = "";
     /**
      * post请求标识
      **/

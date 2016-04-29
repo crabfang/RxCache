@@ -18,11 +18,11 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit.RestAdapter;
+import rx.Observable;
+import rx.functions.Func1;
 
 public class MainActivity extends AppCompatActivity {
     protected static String TAG = "MainActivity";
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        StringHttpFactory.logLevel = RestAdapter.LogLevel.BASIC;
+        StringHttpFactory.logLevel = RestAdapter.LogLevel.FULL;
         DiskCacheManager.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
     }
 
@@ -40,20 +40,38 @@ public class MainActivity extends AppCompatActivity {
         Log.w(TAG, "click both");
 
         RequestParams params = new RequestParams();
-        params.host = "https://www.github.com";
+        params.host = "http://www.github.com";
         params.path = "crabfang/RxCache";
-        Map<String, String> query = new HashMap<>();
-        query.put("loadingImageType", "android-large");
-        params.query = query;
 
-        DoubleCacheUseCase<GitHubBean> useCase = new DoubleCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
-        useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<GitHubBean>() {
+        DoubleCacheUseCase<HostBean> useCase = new DoubleCacheUseCase<>(new TypeToken<HostBean>(){}, params);
+        useCase.setHttpTransformer(new Func1<HostBean, Observable<HostBean>>() {
             @Override
-            public GitHubBean buildData(String responseStr) {
-                return new GitHubBean();
+            public Observable<HostBean> call(HostBean hostBean) {
+                RequestParams params = new RequestParams();
+                params.host = "https://www.bing.com";
+                final DoubleCacheUseCase<HostBean> useCase = new HttpCacheUseCase<>(new TypeToken<HostBean>(){}, params);
+                useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<HostBean>() {
+                    @Override
+                    public HostBean buildData(String responseStr) {
+                        return new HostBean("Bing");
+                    }
+                });
+                return useCase.buildHttpObservable().map(new Func1<HostBean, HostBean>() {
+                    @Override
+                    public HostBean call(HostBean hostBean) {
+                        useCase.saveCacheDisk(hostBean);
+                        return hostBean;
+                    }
+                });
             }
         });
-        useCase.execute(new SimpleViewPresenter<GitHubBean>());
+        useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<HostBean>() {
+            @Override
+            public HostBean buildData(String responseStr) {
+                return new HostBean("GitHub");
+            }
+        });
+        useCase.execute(new SimpleViewPresenter<HostBean>());
     }
 
     public void clickDisk(View v) {
@@ -82,20 +100,17 @@ public class MainActivity extends AppCompatActivity {
         Log.w(TAG, "click http");
 
         RequestParams params = new RequestParams();
-        params.host = "https://www.github.com";
+        params.host = "http://www.github.com";
         params.path = "crabfang/RxCache";
-        Map<String, String> query = new HashMap<>();
-        query.put("loadingImageType", "android-large");
-        params.query = query;
 
-        DoubleCacheUseCase<GitHubBean> useCase = new HttpCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
-        useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<GitHubBean>() {
+        DoubleCacheUseCase<HostBean> useCase = new HttpCacheUseCase<>(new TypeToken<HostBean>(){}, params);
+        useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<HostBean>() {
             @Override
-            public GitHubBean buildData(String responseStr) {
-                return new GitHubBean();
+            public HostBean buildData(String responseStr) {
+                return new HostBean("GitHub");
             }
         });
-        useCase.execute(new SimpleViewPresenter<GitHubBean>());
+        useCase.execute(new SimpleViewPresenter<HostBean>());
     }
 
     private class Person {
@@ -113,13 +128,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class GitHubBean {
+    private class HostBean {
         public String str;
-        public GitHubBean() {
-            setStr("");
+        public HostBean(String str) {
+            setStr(str);
         }
         public void setStr(String str) {
             this.str = str;
+        }
+
+        public String toString() {
+            return "Host:" + str;
         }
     }
 }
