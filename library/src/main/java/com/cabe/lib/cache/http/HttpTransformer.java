@@ -1,6 +1,7 @@
 package com.cabe.lib.cache.http;
 
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * Http RxJava Response数据转换类
@@ -8,5 +9,14 @@ import rx.Observable;
  */
 public abstract class HttpTransformer<T> implements Observable.Transformer<String, T> {
     @Override
-    public abstract Observable<T> call(rx.Observable<String> stringObservable);
+    public Observable<T> call(rx.Observable<String> stringObservable) {
+        return stringObservable.map(new Func1<String, T>() {
+            @Override
+            public T call(String s) {
+                return buildData(s);
+            }
+        });
+    }
+
+    public abstract T buildData(String responseStr);
 }

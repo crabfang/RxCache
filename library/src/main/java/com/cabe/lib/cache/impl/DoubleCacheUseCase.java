@@ -68,6 +68,14 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
         this.httpManager = httpManager;
     }
 
+    public DiskCacheRepository getDiskRepository() {
+        return diskManager;
+    }
+
+    public HttpCacheRepository<T> getHttpRepository() {
+        return httpManager;
+    }
+
     public boolean saveCacheDisk(T data) {
         boolean saveResult = false;
         if(diskManager != null) {

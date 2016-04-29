@@ -5,8 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.cabe.lib.cache.AbstractCacheUseCase;
+import com.cabe.lib.cache.DiskCacheRepository;
 import com.cabe.lib.cache.disk.DiskCacheManager;
+import com.cabe.lib.cache.http.HttpTransformer;
 import com.cabe.lib.cache.http.RequestParams;
 import com.cabe.lib.cache.http.StringHttpFactory;
 import com.cabe.lib.cache.impl.DiskCacheUseCase;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        StringHttpFactory.logLevel = RestAdapter.LogLevel.NONE;
+        StringHttpFactory.logLevel = RestAdapter.LogLevel.BASIC;
         DiskCacheManager.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
     }
 
@@ -39,34 +40,41 @@ public class MainActivity extends AppCompatActivity {
         Log.w(TAG, "click both");
 
         RequestParams params = new RequestParams();
-        params.host = "https://www.cabe.com";
-        params.path = "appLoadingImage.htm";
+        params.host = "https://www.github.com";
+        params.path = "crabfang/RxCache";
         Map<String, String> query = new HashMap<>();
         query.put("loadingImageType", "android-large");
         params.query = query;
 
-        AbstractCacheUseCase<GitHubBean> useCase = new DoubleCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
+        DoubleCacheUseCase<GitHubBean> useCase = new DoubleCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
+        useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<GitHubBean>() {
+            @Override
+            public GitHubBean buildData(String responseStr) {
+                return new GitHubBean();
+            }
+        });
         useCase.execute(new SimpleViewPresenter<GitHubBean>());
     }
 
     public void clickDisk(View v) {
         Log.w(TAG, "click disk");
 
-        DiskCacheManager cacheManager = new DiskCacheManager();
-
-        TypeToken<List<Person>> typeToken = new TypeToken<List<Person>>(){};
-        if(!cacheManager.exits(typeToken)) {
-            List<Person> list = new ArrayList<>();
-            for(int i=0;i<10;i++) {
-                Person p = new Person();
-                p.name = "name " + i;
-                p.age = 10 + i;
-                list.add(p);
+        DoubleCacheUseCase<List<Person>> useCase = new DiskCacheUseCase<>(new TypeToken<List<Person>>(){});
+        DiskCacheRepository cacheManager = useCase.getDiskRepository();
+        if(cacheManager != null) {
+            TypeToken<List<Person>> typeToken = new TypeToken<List<Person>>(){};
+            if(!cacheManager.exits(typeToken)) {
+                List<Person> list = new ArrayList<>();
+                for (int i = 0; i < 10; i++) {
+                    Person p = new Person();
+                    p.setName("name " + i);
+                    p.setAge(10 + i);
+                    list.add(p);
+                }
+                cacheManager.put(typeToken, list);
             }
-            cacheManager.put(typeToken, list);
         }
 
-        AbstractCacheUseCase<List<Person>> useCase = new DiskCacheUseCase<>(new TypeToken<List<Person>>(){});
         useCase.execute(new SimpleViewPresenter<List<Person>>());
     }
 
@@ -74,13 +82,19 @@ public class MainActivity extends AppCompatActivity {
         Log.w(TAG, "click http");
 
         RequestParams params = new RequestParams();
-        params.host = "https://www.cabe.com";
-        params.path = "appLoadingImage.htm";
+        params.host = "https://www.github.com";
+        params.path = "crabfang/RxCache";
         Map<String, String> query = new HashMap<>();
         query.put("loadingImageType", "android-large");
         params.query = query;
 
-        AbstractCacheUseCase<GitHubBean> useCase = new HttpCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
+        DoubleCacheUseCase<GitHubBean> useCase = new HttpCacheUseCase<>(new TypeToken<GitHubBean>(){}, params);
+        useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<GitHubBean>() {
+            @Override
+            public GitHubBean buildData(String responseStr) {
+                return new GitHubBean();
+            }
+        });
         useCase.execute(new SimpleViewPresenter<GitHubBean>());
     }
 
@@ -101,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
 
     private class GitHubBean {
         public String str;
+        public GitHubBean() {
+            setStr("");
+        }
         public void setStr(String str) {
             this.str = str;
         }

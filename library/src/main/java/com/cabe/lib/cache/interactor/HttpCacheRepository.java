@@ -11,5 +11,5 @@ import rx.Observable;
  */
 public interface HttpCacheRepository<T> {
     Observable<T> getHttpObservable(RequestParams params);
-    HttpTransformer<T> getResponseTransformer();
+    void setResponseTransformer(HttpTransformer<T> transformer);
 }

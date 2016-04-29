@@ -13,16 +13,16 @@ public class SimpleViewPresenter<T> implements ViewPresenter<T> {
     protected final static String TAG = "SimpleViewPresenter";
     @Override
     public void error(CacheSource from, int code, String info) {
-        Log.i(TAG, "error:" + from + "-->" + code + "#" + info);
+        Log.d(TAG, "error:" + from + "-->" + code + "#" + info);
     }
 
     @Override
     public void load(CacheSource from, T data) {
-        Log.i(TAG, "load:" + from + "-->" + data);
+        Log.d(TAG, "load:" + from + "-->" + data);
     }
 
     @Override
     public void complete(CacheSource from) {
-        Log.i(TAG, "complete:" + from);
+        Log.d(TAG, "complete:" + from);
     }
 }

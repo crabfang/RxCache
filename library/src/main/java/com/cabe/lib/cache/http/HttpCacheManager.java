@@ -15,29 +15,25 @@ import rx.functions.Func1;
  */
 public class HttpCacheManager<T> implements HttpCacheRepository<T> {
     private TypeToken<T> typeToken;
+    private HttpTransformer<T> transformer = new HttpTransformer<T>() {
+        @Override
+        public T buildData(String responseStr) {
+            if(typeToken == null) {
+                throw RxException.build(ExceptionCode.RX_EXCEPTION_TYPE_UNKNOWN, null);
+            }
+            return new Gson().fromJson(responseStr, typeToken.getType());
+        }
+    };
     public HttpCacheManager(TypeToken<T> typeToken) {
         this.typeToken = typeToken;
     }
     @Override
     public Observable<T> getHttpObservable(RequestParams params) {
-        return StringHttpFactory.createRequest(params).compose(getResponseTransformer());
+        return StringHttpFactory.createRequest(params).compose(transformer);
     }
 
     @Override
-    public HttpTransformer<T> getResponseTransformer() {
-        return new HttpTransformer<T>() {
-            @Override
-            public Observable<T> call(Observable<String> stringObservable) {
-                return stringObservable.map(new Func1<String, T>() {
-                    @Override
-                    public T call(String resp) {
-                        if(typeToken == null) {
-                            throw RxException.build(ExceptionCode.RX_EXCEPTION_TYPE_UNKNOWN, null);
-                        }
-                        return new Gson().fromJson(resp, typeToken.getType());
-                    }
-                });
-            }
-        };
+    public void setResponseTransformer(HttpTransformer<T> transformer) {
+        this.transformer = transformer;
     }
 }
