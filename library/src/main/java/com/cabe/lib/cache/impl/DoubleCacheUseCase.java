@@ -35,6 +35,8 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
     private HttpCacheRepository<T> httpManager;
     private RequestParams params = null;
 
+    private boolean flagSaveData;
+
     /**
      * 使用observable.flatMap(Fun1)来做数据转换<br>
      * 而不是用observable.compose(Transformer)的原因是<br>
@@ -85,6 +87,10 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
 
     public void setHttpTransformer(Func1<T, Observable<T>> transformer) {
         this.httpTransformer = transformer;
+    }
+
+    public void setSaveData(boolean flagSaveData) {
+        this.flagSaveData = flagSaveData;
     }
 
     public DiskCacheRepository getDiskRepository() {
@@ -144,7 +150,7 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
             }
             @Override
             public void load(CacheSource from, T data) {
-                if(getCacheMethod() == CacheMethod.BOTH) {
+                if(flagSaveData && getCacheMethod() == CacheMethod.BOTH) {
                     if(from == CacheSource.HTTP) {
                         saveCacheDisk(data);
                     }
