@@ -104,7 +104,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        useCase.execute(new SimpleViewPresenter<List<Person>>());
+        useCase.execute(new SimpleViewPresenter<List<Person>>(){
+            @Override
+            public void load(CacheSource from, List<Person> data) {
+                Log.w("MainActivity", "load:" + from);
+                label.setText("" + from);
+            }
+        });
     }
 
     public void clickHttp(View v) {
@@ -121,7 +127,13 @@ public class MainActivity extends AppCompatActivity {
                 return new HostBean("GitHub");
             }
         });
-        useCase.execute(new SimpleViewPresenter<HostBean>());
+        useCase.execute(new SimpleViewPresenter<HostBean>(){
+            @Override
+            public void load(CacheSource from, HostBean data) {
+                Log.w("MainActivity", "load:" + from);
+                label.setText("" + from);
+            }
+        });
     }
 
     private class Person {
