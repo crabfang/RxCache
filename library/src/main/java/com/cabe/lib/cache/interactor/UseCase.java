@@ -44,10 +44,10 @@ public abstract class UseCase<T> {
     public Subscription execute(Subscriber<T> subscriber) {
         Observable<T> observable = this.buildUseCaseObservable();
         if(subscribeScheduler != null) {
-            observable.subscribeOn(subscribeScheduler);
+            observable = observable.subscribeOn(subscribeScheduler);
         }
         if(observeScheduler != null) {
-            observable.observeOn(observeScheduler);
+            observable = observable.observeOn(observeScheduler);
         }
         this.subscription = observable.subscribe(subscriber);
         return subscriber;

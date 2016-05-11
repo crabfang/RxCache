@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
+import com.cabe.lib.cache.CacheSource;
 import com.cabe.lib.cache.DiskCacheRepository;
 import com.cabe.lib.cache.disk.DiskCacheManager;
 import com.cabe.lib.cache.http.HttpTransformer;
@@ -27,10 +29,13 @@ import rx.functions.Func1;
 public class MainActivity extends AppCompatActivity {
     protected static String TAG = "MainActivity";
 
+    private TextView label;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        label = (TextView) findViewById(R.id.activity_main_label);
 
         StringHttpFactory.logLevel = RestAdapter.LogLevel.FULL;
         DiskCacheManager.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
@@ -71,7 +76,13 @@ public class MainActivity extends AppCompatActivity {
                 return new HostBean("GitHub");
             }
         });
-        useCase.execute(new SimpleViewPresenter<HostBean>());
+        useCase.execute(new SimpleViewPresenter<HostBean>(){
+            @Override
+            public void load(CacheSource from, HostBean data) {
+                Log.w("MainActivity", "load:" + from);
+                label.setText("" + from);
+            }
+        });
     }
 
     public void clickDisk(View v) {
