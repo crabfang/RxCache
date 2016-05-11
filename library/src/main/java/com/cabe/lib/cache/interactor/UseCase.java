@@ -1,13 +1,12 @@
 package com.cabe.lib.cache.interactor;
 
-import com.cabe.lib.cache.executor.JobExecutor;
-import com.cabe.lib.cache.executor.UIThread;
 import com.google.gson.reflect.TypeToken;
 
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
 
@@ -19,8 +18,8 @@ public abstract class UseCase<T> {
 
     private Subscription subscription = Subscriptions.empty();
 
-    private Scheduler subscribeScheduler = Schedulers.from(new JobExecutor());
-    private Scheduler observeScheduler = new UIThread().getScheduler();
+    private Scheduler subscribeScheduler = Schedulers.io();
+    private Scheduler observeScheduler = AndroidSchedulers.mainThread();
 
     private TypeToken<T> typeT;
 
