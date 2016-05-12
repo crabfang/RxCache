@@ -26,7 +26,7 @@ public class DefaultSubscriber<T> extends rx.Subscriber<T> {
 
     @Override public void onError(Throwable e) {
         int code = ExceptionCode.RX_EXCEPTION_DEFAULT;
-        String info;
+        String info = "";
         if(e instanceof RxException) {
             RxException rxException = (RxException) e;
             code = rxException.code;
@@ -36,8 +36,10 @@ public class DefaultSubscriber<T> extends rx.Subscriber<T> {
             }
         } else if(e instanceof RetrofitError) {
             RetrofitError error = (RetrofitError) e;
-            code = error.getResponse().getStatus();
-            info = error.getResponse().getReason();
+            if(error.getResponse() != null) {
+                code = error.getResponse().getStatus();
+                info = error.getResponse().getReason();
+            }
             Throwable detail = error.getCause();
             if(detail != null) {
                 detail.printStackTrace();

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.cabe.lib.cache.exception.HttpExceptionCode;
 import com.cabe.lib.cache.exception.RxException;
+import com.squareup.okhttp.OkHttpClient;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -27,6 +28,10 @@ import rx.Observable;
  */
 public class StringHttpFactory {
     public static RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
+    private static OkHttpClient httpClient = OkHttpClientFactory.create();
+    public static OkHttpClient getHttpClient() {
+        return httpClient;
+    }
     public static Observable<String> createRequest(RequestParams params, Converter converter) {
         if(params == null) {
             throw RxException.build(HttpExceptionCode.HTTP_STATUS_LOACL_REQUEST_NONE, null);
@@ -67,7 +72,7 @@ public class StringHttpFactory {
             if(converter != null) {
                 retrofit.setConverter(converter);
             }
-            retrofit.setClient(new OkClient(OkHttpClientFactory.create()));
+            retrofit.setClient(new OkClient(getHttpClient()));
             if(dataInterceptor != null) {
                 retrofit.setRequestInterceptor(dataInterceptor);
             }
