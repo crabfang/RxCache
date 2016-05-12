@@ -16,6 +16,7 @@ import retrofit.mime.TypedOutput;
  * Created by cabe on 16/4/12.
  */
 public final class StringConverterFactory implements Converter {
+    public static String ENCODE = "UTF-8";
     public StringConverterFactory() {
     }
 
@@ -40,7 +41,7 @@ public final class StringConverterFactory implements Converter {
     }
 
     public static String fromStream(InputStream in) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, ENCODE));
         StringBuilder out = new StringBuilder();
         String newLine = System.getProperty("line.separator");
 
