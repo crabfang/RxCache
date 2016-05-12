@@ -55,7 +55,9 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
             super.setPostThread(null);
         }
 
-        this.params = params;
+        setSaveData(true);
+        setRequestParams(params);
+        setDiskTransformer(null);
 
         String diskCachePath = DiskCacheManager.DISK_CACHE_PATH;
         if(diskCachePath != null && !diskCachePath.equals("")) {
@@ -89,6 +91,10 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
 
     public void setHttpTransformer(Func1<T, Observable<T>> transformer) {
         this.httpTransformer = transformer;
+    }
+
+    public void setRequestParams(RequestParams params) {
+        this.params = params;
     }
 
     public void setSaveData(boolean flagSaveData) {
