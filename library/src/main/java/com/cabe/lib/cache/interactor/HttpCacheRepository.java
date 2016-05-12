@@ -3,6 +3,7 @@ package com.cabe.lib.cache.interactor;
 import com.cabe.lib.cache.http.HttpTransformer;
 import com.cabe.lib.cache.http.RequestParams;
 
+import retrofit.converter.Converter;
 import rx.Observable;
 
 /**
@@ -12,4 +13,5 @@ import rx.Observable;
 public interface HttpCacheRepository<T> {
     Observable<T> getHttpObservable(RequestParams params);
     void setResponseTransformer(HttpTransformer<T> transformer);
+    void setRequestConverter(Converter converter);
 }

@@ -6,8 +6,8 @@ import com.cabe.lib.cache.interactor.HttpCacheRepository;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import retrofit.converter.Converter;
 import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * 网络请求实现
@@ -15,6 +15,7 @@ import rx.functions.Func1;
  */
 public class HttpCacheManager<T> implements HttpCacheRepository<T> {
     private TypeToken<T> typeToken;
+    private Converter converter = StringConverterFactory.create();
     private HttpTransformer<T> transformer = new HttpTransformer<T>() {
         @Override
         public T buildData(String responseStr) {
@@ -29,11 +30,16 @@ public class HttpCacheManager<T> implements HttpCacheRepository<T> {
     }
     @Override
     public Observable<T> getHttpObservable(RequestParams params) {
-        return StringHttpFactory.createRequest(params).compose(transformer);
+        return StringHttpFactory.createRequest(params, converter).compose(transformer);
     }
 
     @Override
     public void setResponseTransformer(HttpTransformer<T> transformer) {
         this.transformer = transformer;
+    }
+
+    @Override
+    public void setRequestConverter(Converter converter) {
+        this.converter = converter;
     }
 }

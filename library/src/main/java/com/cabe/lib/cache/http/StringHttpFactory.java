@@ -27,18 +27,17 @@ import rx.Observable;
  */
 public class StringHttpFactory {
     public static RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
-    public static Observable<String> createRequest(RequestParams params) {
+    public static Observable<String> createRequest(RequestParams params, Converter converter) {
         if(params == null) {
             throw RxException.build(HttpExceptionCode.HTTP_STATUS_LOACL_REQUEST_NONE, null);
         }
-        ApiService apiService = buildApiService(params);
+        ApiService apiService = buildApiService(params, converter);
         return params.isPost
                 ? apiService.post(params.path, params.query, params.body)
                 : apiService.get(params.path, params.query);
     }
 
-    private static ApiService buildApiService(final RequestParams params) {
-        Converter converter = StringConverterFactory.create();
+    private static ApiService buildApiService(final RequestParams params, Converter converter) {
         String host = params.host;
         RequestInterceptor requestInterceptor = new RequestInterceptor() {
             @Override
@@ -65,7 +64,9 @@ public class StringHttpFactory {
             retrofit.setLog(new HttpLog());
             retrofit.setLogLevel(logLevel);
             retrofit.setEndpoint(baseUrl);
-            retrofit.setConverter(converter);
+            if(converter != null) {
+                retrofit.setConverter(converter);
+            }
             retrofit.setClient(new OkClient(OkHttpClientFactory.create()));
             if(dataInterceptor != null) {
                 retrofit.setRequestInterceptor(dataInterceptor);
