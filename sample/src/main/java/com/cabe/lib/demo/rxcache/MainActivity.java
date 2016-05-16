@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         if(vfyCode.isEmpty()) {
             clickImage(null);
         } else {
-            LoginUseCase useCase = new LoginUseCase(vfyCode);
+            LoginUseCase useCase = new LoginUseCase("MzgwMDE3ODQ=", "Nzg0", vfyCode);
             useCase.execute(new SimpleViewPresenter<String>(){
                 @Override
                 public void load(CacheSource from, String data) {

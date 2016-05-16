@@ -12,7 +12,7 @@ import java.util.HashMap;
  * Created by cabe on 16/5/12.
  */
 public class LoginUseCase extends HttpCacheUseCase<String> {
-    public LoginUseCase(String vfy) {
+    public LoginUseCase(String username, String password, String vfy) {
         super(new TypeToken<String>(){}, null);
 
         RequestParams params = new RequestParams();
@@ -20,8 +20,8 @@ public class LoginUseCase extends HttpCacheUseCase<String> {
         params.path = "WebLogin.do?method=check";
         params.isPost = true;
         params.body = new HashMap<>();
-        params.body.put("formusercode", "username");
-        params.body.put("formuserpassword", "password");
+        params.body.put("formusercode", username);
+        params.body.put("formuserpassword", password);
         params.body.put("formconfirmpassword", vfy);
         params.body.put("formusertype", "1");
         setRequestParams(params);

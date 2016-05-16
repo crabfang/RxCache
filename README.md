@@ -4,7 +4,7 @@
 ``` xml
 
 dependencies {
-    compile 'com.cabe.lib:RxCache:1.2.0-beta'
+    compile 'com.cabe.lib:RxCache:1.2.0-beta1'
 }
 
 ``` 
