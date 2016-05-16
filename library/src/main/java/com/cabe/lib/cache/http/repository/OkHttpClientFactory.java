@@ -1,4 +1,4 @@
-package com.cabe.lib.cache.http;
+package com.cabe.lib.cache.http.repository;
 
 import com.squareup.okhttp.OkHttpClient;
 
@@ -12,17 +12,15 @@ import java.util.concurrent.TimeUnit;
 public class OkHttpClientFactory {
     private static OkHttpClient okHttpClient;
 
-    public OkHttpClientFactory() {
+    private OkHttpClientFactory() {
     }
 
     public static OkHttpClient create() {
         if(null == okHttpClient) {
-            Class var0 = OkHttpClientFactory.class;
             synchronized(OkHttpClientFactory.class) {
                 if(null == okHttpClient) {
-                    OkHttpClient client = new OkHttpClient();
-                    okHttpClient = client;
-                    client.setConnectTimeout(30L, TimeUnit.SECONDS);
+                    okHttpClient = new OkHttpClient();
+                    okHttpClient.setConnectTimeout(10L, TimeUnit.SECONDS);
                 }
             }
         }

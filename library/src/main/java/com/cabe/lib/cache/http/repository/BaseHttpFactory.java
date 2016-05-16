@@ -1,10 +1,9 @@
-package com.cabe.lib.cache.http;
+package com.cabe.lib.cache.http.repository;
 
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.cabe.lib.cache.exception.HttpExceptionCode;
-import com.cabe.lib.cache.exception.RxException;
+import com.cabe.lib.cache.http.RequestParams;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.util.Iterator;
@@ -14,35 +13,19 @@ import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
 import retrofit.converter.Converter;
-import retrofit.http.FieldMap;
-import retrofit.http.FormUrlEncoded;
-import retrofit.http.GET;
-import retrofit.http.POST;
-import retrofit.http.Path;
-import retrofit.http.QueryMap;
-import rx.Observable;
 
 /**
- * 简单的Retrofit实现<br>
- * Created by cabe on 16/4/12.
+ * base http
+ * Created by cabe on 16/5/16.
  */
-public class StringHttpFactory {
+public class BaseHttpFactory {
     public static RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
     private static OkHttpClient httpClient = OkHttpClientFactory.create();
     public static OkHttpClient getHttpClient() {
         return httpClient;
     }
-    public static Observable<String> createRequest(RequestParams params, Converter converter) {
-        if(params == null) {
-            throw RxException.build(HttpExceptionCode.HTTP_STATUS_LOACL_REQUEST_NONE, null);
-        }
-        ApiService apiService = buildApiService(params, converter);
-        return params.isPost
-                ? apiService.post(params.path, params.query, params.body)
-                : apiService.get(params.path, params.query);
-    }
 
-    private static ApiService buildApiService(final RequestParams params, Converter converter) {
+    protected static <T> T buildApiService(final RequestParams params, Converter converter, Class<T> clazz) {
         String host = params.host;
         RequestInterceptor requestInterceptor = new RequestInterceptor() {
             @Override
@@ -58,10 +41,10 @@ public class StringHttpFactory {
                 }
             }
         };
-        return getRetrofit(converter, host, requestInterceptor).create(ApiService.class);
+        return getRetrofit(converter, host, requestInterceptor).create(clazz);
     }
 
-    private static RestAdapter getRetrofit(Converter converter, String baseUrl, RequestInterceptor dataInterceptor) {
+    protected static RestAdapter getRetrofit(Converter converter, String baseUrl, RequestInterceptor dataInterceptor) {
         if(TextUtils.isEmpty(baseUrl)) {
             throw new RuntimeException("baseUrl is null");
         } else {
@@ -81,19 +64,10 @@ public class StringHttpFactory {
         }
     }
 
-    private static class HttpLog implements RestAdapter.Log {
+    protected static class HttpLog implements RestAdapter.Log {
         @Override
         public void log(String message) {
             Log.i("RxCache.Http", message);
         }
-    }
-
-    public interface ApiService {
-        @GET("/{url}")
-        Observable<String> get(@Path(value = "url", encode = false) String path, @QueryMap Map<String, String> query);
-
-        @FormUrlEncoded
-        @POST("/{url}")
-        Observable<String> post(@Path(value = "url", encode = false) String path, @QueryMap Map<String, String> query, @FieldMap Map<String, String> body);
     }
 }

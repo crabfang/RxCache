@@ -43,4 +43,34 @@
         android:onClick="clickHttp"
         android:text="click http" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/activity_main_view_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/activity_main_view_image"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:onClick="clickImage"
+            android:contentDescription="@string/app_name" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/activity_main_btn_image"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:onClick="clickLogin"
+        android:text="click image" />
+
 </LinearLayout>

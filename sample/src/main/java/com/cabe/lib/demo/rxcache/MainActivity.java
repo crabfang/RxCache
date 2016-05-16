@@ -4,14 +4,19 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.cabe.lib.cache.CacheSource;
 import com.cabe.lib.cache.DiskCacheRepository;
 import com.cabe.lib.cache.disk.DiskCacheManager;
-import com.cabe.lib.cache.http.HttpTransformer;
+import com.cabe.lib.cache.http.transformer.HttpStringTransformer;
 import com.cabe.lib.cache.http.RequestParams;
-import com.cabe.lib.cache.http.StringHttpFactory;
+import com.cabe.lib.cache.http.repository.BaseHttpFactory;
+import com.cabe.lib.cache.http.repository.WebCookiesHandler;
+import com.cabe.lib.cache.impl.BytesUseCase;
 import com.cabe.lib.cache.impl.DiskCacheUseCase;
 import com.cabe.lib.cache.impl.DoubleCacheUseCase;
 import com.cabe.lib.cache.impl.HttpCacheUseCase;
@@ -30,15 +35,20 @@ public class MainActivity extends AppCompatActivity {
     protected static String TAG = "MainActivity";
 
     private TextView label;
+    private ImageView image;
+    private EditText input;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         label = (TextView) findViewById(R.id.activity_main_label);
+        image = (ImageView) findViewById(R.id.activity_main_view_image);
+        input = (EditText) findViewById(R.id.activity_main_view_input);
 
-        StringHttpFactory.logLevel = RestAdapter.LogLevel.FULL;
         DiskCacheManager.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
+        BaseHttpFactory.logLevel = RestAdapter.LogLevel.FULL;
+        BaseHttpFactory.getHttpClient().setCookieHandler(new WebCookiesHandler());
     }
 
     public void clickBoth(View v) {
@@ -55,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 RequestParams params = new RequestParams();
                 params.host = "https://www.bing.com";
                 final DoubleCacheUseCase<HostBean> useCase = new HttpCacheUseCase<>(new TypeToken<HostBean>(){}, params);
-                useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<HostBean>() {
+                useCase.getHttpRepository().setResponseTransformer(new HttpStringTransformer<HostBean>() {
                     @Override
                     public HostBean buildData(String responseStr) {
                         return new HostBean("Bing");
@@ -70,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-        useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<HostBean>() {
+        useCase.getHttpRepository().setResponseTransformer(new HttpStringTransformer<HostBean>() {
             @Override
             public HostBean buildData(String responseStr) {
                 return new HostBean("GitHub");
@@ -80,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void load(CacheSource from, HostBean data) {
                 Log.w("MainActivity", "load:" + from);
-                label.setText("" + from);
+                label.setText(String.valueOf("" + from));
             }
         });
     }
@@ -108,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void load(CacheSource from, List<Person> data) {
                 Log.w("MainActivity", "load:" + from);
-                label.setText("" + from);
+                label.setText(String.valueOf("" + from));
             }
         });
     }
@@ -121,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         params.path = "crabfang/RxCache";
 
         DoubleCacheUseCase<HostBean> useCase = new HttpCacheUseCase<>(new TypeToken<HostBean>(){}, params);
-        useCase.getHttpRepository().setResponseTransformer(new HttpTransformer<HostBean>() {
+        useCase.getHttpRepository().setResponseTransformer(new HttpStringTransformer<HostBean>() {
             @Override
             public HostBean buildData(String responseStr) {
                 return new HostBean("GitHub");
@@ -131,9 +141,47 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void load(CacheSource from, HostBean data) {
                 Log.w("MainActivity", "load:" + from);
-                label.setText("" + from);
+                label.setText(String.valueOf("" + from));
             }
         });
+    }
+
+    public void clickImage(View view) {
+        Log.w(TAG, "click image");
+
+        RequestParams params = new RequestParams();
+        params.host = "http://www.zjsxyc.com";
+        params.path = "/public/public/image.jsp";
+
+        BytesUseCase useCase = new BytesUseCase(params);
+        useCase.execute(new SimpleViewPresenter<byte[]>(){
+            @Override
+            public void load(CacheSource from, byte[] data) {
+                Glide.with(MainActivity.this).load(data).into(image);
+            }
+
+            @Override
+            public void error(CacheSource from, int code, String info) {
+                Log.w("MainActivity", "error:" + info);
+            }
+        });
+    }
+
+    public void clickLogin(View view) {
+        Log.w(TAG, "click login");
+
+        String vfyCode = input.getText().toString();
+        if(vfyCode.isEmpty()) {
+            clickImage(null);
+        } else {
+            LoginUseCase useCase = new LoginUseCase(vfyCode);
+            useCase.execute(new SimpleViewPresenter<String>(){
+                @Override
+                public void load(CacheSource from, String data) {
+                    super.load(from, data);
+                }
+            });
+        }
     }
 
     private class Person {

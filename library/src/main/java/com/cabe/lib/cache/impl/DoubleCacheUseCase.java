@@ -7,7 +7,7 @@ import com.cabe.lib.cache.DiskCacheRepository;
 import com.cabe.lib.cache.disk.DiskCacheManager;
 import com.cabe.lib.cache.exception.DiskExceptionCode;
 import com.cabe.lib.cache.exception.RxException;
-import com.cabe.lib.cache.http.HttpCacheManager;
+import com.cabe.lib.cache.http.HttpStringCacheManager;
 import com.cabe.lib.cache.http.RequestParams;
 import com.cabe.lib.cache.interactor.DefaultSubscriber;
 import com.cabe.lib.cache.interactor.HttpCacheRepository;
@@ -32,7 +32,7 @@ import rx.functions.Func1;
  */
 public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
     private DiskCacheRepository diskManager;
-    private HttpCacheRepository<T> httpManager;
+    private HttpCacheRepository<String, T> httpManager;
     private RequestParams params = null;
 
     private boolean flagSaveData;
@@ -69,7 +69,7 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
             }
             setDiskManager(diskManager);
         }
-        HttpCacheManager<T> httpManager = new HttpCacheManager<>(getTypeToken());
+        HttpStringCacheManager<T> httpManager = new HttpStringCacheManager<>(getTypeToken());
         setHttpManager(httpManager);
     }
 
@@ -81,7 +81,7 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
         this.diskManager = diskManager;
     }
 
-    public void setHttpManager(HttpCacheRepository<T> httpManager) {
+    public void setHttpManager(HttpCacheRepository<String, T> httpManager) {
         this.httpManager = httpManager;
     }
 
@@ -105,7 +105,7 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
         return diskManager;
     }
 
-    public HttpCacheRepository<T> getHttpRepository() {
+    public HttpCacheRepository<String, T> getHttpRepository() {
         return httpManager;
     }
 

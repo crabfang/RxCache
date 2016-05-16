@@ -7,7 +7,9 @@ package com.cabe.lib.cache.exception;
 public class HttpExceptionCode extends ExceptionCode {
     // -1xx(本地错误)
     /** 请求参数为空 */
-    public final static int HTTP_STATUS_LOACL_REQUEST_NONE = -1;
+    public final static int HTTP_STATUS_LOCAL_REQUEST_NONE = -1;
+    /** 数据解析错误 */
+    public final static int HTTP_STATUS_LOCAL_RESPONSE_MISSING = -2;
     //1xx（临时响应）
     //表示临时响应并需要请求者继续执行操作的状态代码。
     /** （继续） 请求者应当继续提出请求。 服务器返回此代码表示已收到请求的第一部分，正在等待其余部分。  */
@@ -140,8 +142,11 @@ public class HttpExceptionCode extends ExceptionCode {
 
         if(ExceptionCode.isHttpException(code)) {
             switch (code) {
-                case HTTP_STATUS_LOACL_REQUEST_NONE:
+                case HTTP_STATUS_LOCAL_REQUEST_NONE:
                     info = "请求参数异常";
+                    break;
+                case HTTP_STATUS_LOCAL_RESPONSE_MISSING:
+                    info = "网络数据丢失";
                     break;
                 case HTTP_STATUS_SUCCESS_OK:
                     info = "成功";
