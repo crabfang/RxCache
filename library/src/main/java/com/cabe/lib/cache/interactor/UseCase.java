@@ -49,12 +49,19 @@ public abstract class UseCase<T> {
         if(observeScheduler != null) {
             observable = observable.observeOn(observeScheduler);
         }
-        this.subscription = observable.subscribe(subscriber);
-        return subscriber;
+        Subscription subscription = observable.subscribe(subscriber);
+        setSubscription(subscription);
+        return subscription;
+    }
+
+    public void setSubscription(Subscription subscription) {
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            this.subscription = subscription;
+        }
     }
 
     public void unsubscribe() {
-        if (!subscription.isUnsubscribed()) {
+        if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
     }
