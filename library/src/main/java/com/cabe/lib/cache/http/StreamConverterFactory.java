@@ -61,8 +61,8 @@ public class StreamConverterFactory implements Converter {
         return null;
     }
 
-    public static String inputStream2String(InputStream in) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in, ENCODE));
+    public static String inputStream2String(InputStream in, String encode) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, encode));
         StringBuilder out = new StringBuilder();
         String newLine = System.getProperty("line.separator");
 

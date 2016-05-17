@@ -17,11 +17,14 @@ import rx.Observable;
  * Created by cabe on 16/4/14.
  */
 public class HttpStringCacheManager<T> implements HttpCacheRepository<String, T> {
+    private String encode;
     private TypeToken<T> typeToken;
     private Converter converter = null;
     private Observable.Transformer<String, T> transformer = null;
+
     public HttpStringCacheManager(TypeToken<T> token) {
         this.typeToken = token;
+        setStringEncode(StreamConverterFactory.ENCODE);
         setHttpConverter(StreamConverterFactory.create());
         setResponseTransformer(new HttpStringTransformer<T>() {
             @Override
@@ -35,7 +38,7 @@ public class HttpStringCacheManager<T> implements HttpCacheRepository<String, T>
     }
     @Override
     public Observable<T> getHttpObservable(RequestParams params) {
-        return new InputStreamHttpFactory().createRequest(params, converter).compose(new Stream2StringTransformer()).compose(transformer);
+        return new InputStreamHttpFactory().createRequest(params, converter).compose(new Stream2StringTransformer(encode)).compose(transformer);
     }
 
     @Override
@@ -46,5 +49,9 @@ public class HttpStringCacheManager<T> implements HttpCacheRepository<String, T>
     @Override
     public void setResponseTransformer(Observable.Transformer<String, T> transformer) {
         this.transformer = transformer;
+    }
+
+    public void setStringEncode(String encode) {
+        this.encode = encode;
     }
 }
