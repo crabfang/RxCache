@@ -40,13 +40,14 @@ public abstract class AbstractCacheUseCase<T> extends UseCase<T> {
 
     protected abstract Subscriber<T> getSubscriber(CacheSource from, ViewPresenter<T> presenter);
 
-    public void execute(final ViewPresenter<T> presenter) {
+    public Subscription execute(final ViewPresenter<T> presenter) {
         CacheSource source = cacheMethod == CacheMethod.HTTP ? CacheSource.HTTP : CacheSource.DISK;
         Subscription sc = super.execute(getSubscriber(source, presenter));
         super.setSubscription(sc);
+        return sc;
     }
 
-    protected void executeHttp(final ViewPresenter<T> presenter) {
+    protected Subscription executeHttp(final ViewPresenter<T> presenter) {
         UseCase<T> useCase = new UseCase<T>(getTypeToken()){
             @Override
             public Observable<T> buildUseCaseObservable() {
@@ -55,5 +56,6 @@ public abstract class AbstractCacheUseCase<T> extends UseCase<T> {
         };
         Subscription sc = useCase.execute(getSubscriber(CacheSource.HTTP, presenter));
         super.setSubscription(sc);
+        return sc;
     }
 }
