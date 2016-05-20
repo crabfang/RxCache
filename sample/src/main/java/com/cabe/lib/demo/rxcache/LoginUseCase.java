@@ -18,7 +18,7 @@ public class LoginUseCase extends HttpCacheUseCase<String> {
         RequestParams params = new RequestParams();
         params.host = "http://www.zjsxyc.com";
         params.path = "WebLogin.do?method=check";
-        params.isPost = true;
+        params.requestMethod = RequestParams.REQUEST_METHOD_POST;
         params.body = new HashMap<>();
         params.body.put("formusercode", username);
         params.body.put("formuserpassword", password);

@@ -8,12 +8,14 @@ import java.io.InputStream;
 import java.util.Map;
 
 import retrofit.converter.Converter;
+import retrofit.http.Body;
 import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.QueryMap;
+import retrofit.mime.TypedString;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -32,9 +34,20 @@ public class InputStreamHttpFactory implements HttpFactoryInterface<InputStream>
             });
         }
         ApiService apiService = BaseHttpFactory.buildApiService(params, converter, ApiService.class);
-        return params.isPost
-                ? apiService.post(params.path, params.query, params.body)
-                : apiService.get(params.path, params.query);
+        Observable<InputStream> observable;
+        switch(params.requestMethod) {
+            default:
+            case RequestParams.REQUEST_METHOD_GET:
+                observable = apiService.get(params.path, params.query);
+                break;
+            case RequestParams.REQUEST_METHOD_POST:
+                observable = apiService.post(params.path, params.query, params.body);
+                break;
+            case RequestParams.REQUEST_METHOD_PUT:
+                observable = apiService.put(params.path, params.query, new TypedString(params.putBody));
+                break;
+        }
+        return observable;
     }
 
     private interface ApiService {
@@ -44,5 +57,8 @@ public class InputStreamHttpFactory implements HttpFactoryInterface<InputStream>
         @FormUrlEncoded
         @POST("/{url}")
         Observable<InputStream> post(@Path(value = "url", encode = false) String path, @QueryMap Map<String, String> query, @FieldMap Map<String, String> body);
+
+        @POST("/{url}")
+        Observable<InputStream> put(@Path(value = "url", encode = false) String path, @QueryMap Map<String, String> query, @Body TypedString body);
     }
 }
