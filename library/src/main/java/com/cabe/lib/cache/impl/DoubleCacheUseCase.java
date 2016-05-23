@@ -16,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.functions.Func1;
 
 /**
@@ -173,7 +174,10 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
                     presenter.complete(from);
                 }
                 if(from == CacheSource.DISK && getCacheMethod() == CacheMethod.BOTH) {
-                    executeHttp(presenter);
+                    Subscription subscription = getSubscription();
+                    if(!subscription.isUnsubscribed()) {
+                        executeHttp(presenter);
+                    }
                 }
             }
         });

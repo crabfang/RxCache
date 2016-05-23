@@ -54,10 +54,14 @@ public abstract class UseCase<T> {
         return subscription;
     }
 
-    public void setSubscription(Subscription subscription) {
+    protected void setSubscription(Subscription subscription) {
         if (subscription != null && !subscription.isUnsubscribed()) {
             this.subscription = subscription;
         }
+    }
+
+    protected Subscription getSubscription() {
+        return this.subscription;
     }
 
     public void unsubscribe() {
