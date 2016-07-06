@@ -13,6 +13,7 @@ import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.QueryMap;
 import retrofit.mime.TypedString;
@@ -43,6 +44,9 @@ public class InputStreamHttpFactory implements HttpFactoryInterface<InputStream>
             case RequestParams.REQUEST_METHOD_POST:
                 observable = apiService.post(params.path, params.query, params.body);
                 break;
+            case RequestParams.REQUEST_METHOD_POST_BODY:
+                observable = apiService.postBody(params.path, params.query, new TypedString(params.putBody));
+                break;
             case RequestParams.REQUEST_METHOD_PUT:
                 observable = apiService.put(params.path, params.query, new TypedString(params.putBody));
                 break;
@@ -58,7 +62,11 @@ public class InputStreamHttpFactory implements HttpFactoryInterface<InputStream>
         @POST("/{url}")
         Observable<InputStream> post(@Path(value = "url", encode = false) String path, @QueryMap Map<String, String> query, @FieldMap Map<String, String> body);
 
+        @FormUrlEncoded
         @POST("/{url}")
+        Observable<InputStream> postBody(@Path(value = "url", encode = false) String path, @QueryMap Map<String, String> query, @Body TypedString body);
+
+        @PUT("/{url}")
         Observable<InputStream> put(@Path(value = "url", encode = false) String path, @QueryMap Map<String, String> query, @Body TypedString body);
     }
 }

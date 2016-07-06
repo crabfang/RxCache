@@ -9,7 +9,8 @@ import java.util.Map;
 public class RequestParams {
     public final static int REQUEST_METHOD_GET = 0;
     public final static int REQUEST_METHOD_POST = 1;
-    public final static int REQUEST_METHOD_PUT = 2;
+    public final static int REQUEST_METHOD_POST_BODY = 2;
+    public final static int REQUEST_METHOD_PUT = 3;
     /** https://www.github.com/crabfang/RxCache?key1=val1&key2=val2  */
     /**
      * Http请求的head参数<br>
