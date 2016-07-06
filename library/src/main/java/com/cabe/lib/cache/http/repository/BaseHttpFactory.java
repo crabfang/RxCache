@@ -26,7 +26,7 @@ public class BaseHttpFactory {
     }
 
     protected static <T> T buildApiService(final RequestParams params, Converter converter, Class<T> clazz) {
-        String host = params.host;
+        String host = params.getHost();
         RequestInterceptor requestInterceptor = new RequestInterceptor() {
             @Override
             public void intercept(RequestFacade request) {

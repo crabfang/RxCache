@@ -1,5 +1,8 @@
 package com.cabe.lib.cache.http;
 
+import android.net.Uri;
+
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -38,4 +41,20 @@ public class RequestParams {
     public String path = "";
     /**  请求方式，默认为Get */
     public int requestMethod = REQUEST_METHOD_GET;
+
+    private Uri getUri() {
+        return Uri.parse(host + File.separator + path);
+    }
+
+    public String getHost() {
+        return getUri().getScheme() + "://" + getUri().getAuthority();
+    }
+
+    public String getPath() {
+        String path = getUri().getPath();
+        if(path != null && !path.isEmpty() && path.substring(0, 1).equals("/")) {
+            path = path.substring(1);
+        }
+        return path;
+    }
 }

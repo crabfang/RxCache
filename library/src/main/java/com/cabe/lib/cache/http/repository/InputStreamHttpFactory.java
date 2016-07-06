@@ -39,16 +39,16 @@ public class InputStreamHttpFactory implements HttpFactoryInterface<InputStream>
         switch(params.requestMethod) {
             default:
             case RequestParams.REQUEST_METHOD_GET:
-                observable = apiService.get(params.path, params.query);
+                observable = apiService.get(params.getPath(), params.query);
                 break;
             case RequestParams.REQUEST_METHOD_POST:
-                observable = apiService.post(params.path, params.query, params.body);
+                observable = apiService.post(params.getPath(), params.query, params.body);
                 break;
             case RequestParams.REQUEST_METHOD_POST_BODY:
-                observable = apiService.postBody(params.path, params.query, new TypedString(params.putBody));
+                observable = apiService.postBody(params.getPath(), params.query, new TypedString(params.putBody));
                 break;
             case RequestParams.REQUEST_METHOD_PUT:
-                observable = apiService.put(params.path, params.query, new TypedString(params.putBody));
+                observable = apiService.put(params.getPath(), params.query, new TypedString(params.putBody));
                 break;
         }
         return observable;
