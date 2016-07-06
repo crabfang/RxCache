@@ -43,7 +43,11 @@ public class RequestParams {
     public int requestMethod = REQUEST_METHOD_GET;
 
     private Uri getUri() {
-        return Uri.parse(host + File.separator + path);
+        String pathNew = path;
+        if(pathNew != null && pathNew.startsWith(File.separator)) {
+            pathNew = pathNew.substring(1);
+        }
+        return Uri.parse(host + File.separator + pathNew);
     }
 
     public String getHost() {
@@ -51,10 +55,17 @@ public class RequestParams {
     }
 
     public String getPath() {
-        String path = getUri().getPath();
-        if(path != null && !path.isEmpty() && path.substring(0, 1).equals("/")) {
-            path = path.substring(1);
+        String url = getUri().toString();
+        String host = getHost();
+        if(url == null || host == null) {
+            return "";
         }
-        return path;
+
+        int index = url.indexOf(host);
+        if(index < 0) {
+            index = 0;
+        }
+        index += host.length() + 1;
+        return url.substring(index);
     }
 }
