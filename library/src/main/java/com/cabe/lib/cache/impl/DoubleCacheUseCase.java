@@ -159,7 +159,7 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
             }
             @Override
             public void load(CacheSource from, T data) {
-                if(flagSaveData && getCacheMethod() == CacheMethod.BOTH) {
+                if(flagSaveData) {
                     if(from == CacheSource.HTTP) {
                         saveCacheDisk(data);
                     }
