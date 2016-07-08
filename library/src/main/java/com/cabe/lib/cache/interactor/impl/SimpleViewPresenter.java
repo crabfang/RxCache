@@ -10,7 +10,7 @@ import com.cabe.lib.cache.interactor.ViewPresenter;
  * Created by cabe on 16/4/13.
  */
 public class SimpleViewPresenter<T> implements ViewPresenter<T> {
-    protected final static String TAG = "SimpleViewPresenter";
+    private String TAG = "SimpleViewPresenter";
     @Override
     public void error(CacheSource from, int code, String info) {
         Log.d(TAG, "error:" + from + "-->" + code + "#" + info);
