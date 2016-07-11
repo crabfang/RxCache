@@ -1,6 +1,7 @@
 package com.cabe.lib.cache.http;
 
 import com.cabe.lib.cache.exception.ExceptionCode;
+import com.cabe.lib.cache.exception.HttpExceptionCode;
 import com.cabe.lib.cache.exception.RxException;
 import com.cabe.lib.cache.http.repository.InputStreamHttpFactory;
 import com.cabe.lib.cache.http.transformer.HttpStringTransformer;
@@ -32,7 +33,15 @@ public class HttpStringCacheManager<T> implements HttpCacheRepository<String, T>
                 if(typeToken == null) {
                     throw RxException.build(ExceptionCode.RX_EXCEPTION_TYPE_UNKNOWN, null);
                 }
-                return new Gson().fromJson(responseStr, typeToken.getType());
+                if(typeToken.getType() == String.class) {
+                    return (T) responseStr;
+                } else {
+                    try {
+                        return new Gson().fromJson(responseStr, typeToken.getType());
+                    } catch (Exception e) {
+                        throw RxException.build(HttpExceptionCode.RX_EXCEPTION_TYPE_UNKNOWN, e);
+                    }
+                }
             }
         });
     }

@@ -47,7 +47,11 @@ public class RequestParams {
         if(pathNew != null && pathNew.startsWith(File.separator)) {
             pathNew = pathNew.substring(1);
         }
-        return Uri.parse(host + File.separator + pathNew);
+        String hostNew = host;
+        if(hostNew != null && hostNew.endsWith(File.separator)) {
+            hostNew = hostNew.substring(0, hostNew.length() - 1);
+        }
+        return Uri.parse(hostNew + File.separator + pathNew);
     }
 
     public String getHost() {

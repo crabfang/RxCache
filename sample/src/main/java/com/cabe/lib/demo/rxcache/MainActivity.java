@@ -12,14 +12,15 @@ import com.bumptech.glide.Glide;
 import com.cabe.lib.cache.CacheSource;
 import com.cabe.lib.cache.DiskCacheRepository;
 import com.cabe.lib.cache.disk.DiskCacheManager;
-import com.cabe.lib.cache.http.transformer.HttpStringTransformer;
 import com.cabe.lib.cache.http.RequestParams;
 import com.cabe.lib.cache.http.repository.BaseHttpFactory;
 import com.cabe.lib.cache.http.repository.WebCookiesHandler;
+import com.cabe.lib.cache.http.transformer.HttpStringTransformer;
 import com.cabe.lib.cache.impl.BytesUseCase;
 import com.cabe.lib.cache.impl.DiskCacheUseCase;
 import com.cabe.lib.cache.impl.DoubleCacheUseCase;
 import com.cabe.lib.cache.impl.HttpCacheUseCase;
+import com.cabe.lib.cache.impl.HttpPollUseCase;
 import com.cabe.lib.cache.interactor.impl.SimpleViewPresenter;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,7 +30,9 @@ import java.util.List;
 
 import retrofit.RestAdapter;
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Func1;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
     protected static String TAG = "MainActivity";
@@ -37,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView label;
     private ImageView image;
     private EditText input;
+
+    private CompositeSubscription cs = new CompositeSubscription();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,12 @@ public class MainActivity extends AppCompatActivity {
         DiskCacheManager.DISK_CACHE_PATH = getExternalCacheDir() + File.separator + "data";
         BaseHttpFactory.logLevel = RestAdapter.LogLevel.FULL;
         BaseHttpFactory.getHttpClient().setCookieHandler(new WebCookiesHandler());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cs.unsubscribe();
     }
 
     public void clickBoth(View v) {
@@ -86,13 +97,14 @@ public class MainActivity extends AppCompatActivity {
                 return new HostBean("GitHub");
             }
         });
-        useCase.execute(new SimpleViewPresenter<HostBean>(){
+        Subscription sc = useCase.execute(new SimpleViewPresenter<HostBean>(){
             @Override
             public void load(CacheSource from, HostBean data) {
                 Log.w("MainActivity", "load:" + from);
                 label.setText(String.valueOf("" + from));
             }
         });
+        cs.add(sc);
     }
 
     public void clickDisk(View v) {
@@ -114,13 +126,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        useCase.execute(new SimpleViewPresenter<List<Person>>(){
+        Subscription sc = useCase.execute(new SimpleViewPresenter<List<Person>>(){
             @Override
             public void load(CacheSource from, List<Person> data) {
                 Log.w("MainActivity", "load:" + from);
                 label.setText(String.valueOf("" + from));
             }
         });
+        cs.add(sc);
     }
 
     public void clickHttp(View v) {
@@ -137,13 +150,14 @@ public class MainActivity extends AppCompatActivity {
                 return new HostBean("GitHub");
             }
         });
-        useCase.execute(new SimpleViewPresenter<HostBean>(){
+        Subscription sc = useCase.execute(new SimpleViewPresenter<HostBean>(){
             @Override
             public void load(CacheSource from, HostBean data) {
                 Log.w("MainActivity", "load:" + from);
                 label.setText(String.valueOf("" + from));
             }
         });
+        cs.add(sc);
     }
 
     public void clickImage(View view) {
@@ -154,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         params.path = "/public/public/image.jsp";
 
         BytesUseCase useCase = new BytesUseCase(params);
-        useCase.execute(new SimpleViewPresenter<byte[]>(){
+        Subscription sc = useCase.execute(new SimpleViewPresenter<byte[]>(){
             @Override
             public void load(CacheSource from, byte[] data) {
                 Glide.with(MainActivity.this).load(data).into(image);
@@ -165,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.w("MainActivity", "error:" + info);
             }
         });
+        cs.add(sc);
     }
 
     public void clickLogin(View view) {
@@ -175,13 +190,46 @@ public class MainActivity extends AppCompatActivity {
             clickImage(null);
         } else {
             LoginUseCase useCase = new LoginUseCase("MzgwMDE3ODQ=", "Nzg0", vfyCode);
-            useCase.execute(new SimpleViewPresenter<String>(){
+            Subscription sc = useCase.execute(new SimpleViewPresenter<String>(){
                 @Override
                 public void load(CacheSource from, String data) {
                     super.load(from, data);
                 }
             });
+            cs.add(sc);
         }
+    }
+
+    public void clickPoll(View view) {
+        Log.w(TAG, "click poll");
+
+        RequestParams params = new RequestParams();
+        params.host = "http://api.map.baidu.com/";
+        params.path = "telematics/v3/weather?location=杭州&output=json&ak=5slgyqGDENN7Sy7pw29IUvrZ";
+        final HttpPollUseCase<String> useCase = new HttpPollUseCase<String>(new TypeToken<String>() {
+        }, params) {
+            @Override
+            protected boolean pollFinish(String data) {
+                return false;
+            }
+            @Override
+            protected long getPollIntervalMills(String data) {
+                return 3000;
+            }
+        };
+        useCase.setForceMaxTime(5);
+        Subscription sc = useCase.execute(new SimpleViewPresenter<String>(){
+            @Override
+            public void load(CacheSource from, String data) {
+                Log.w(TAG, "load:" + data);
+            }
+            @Override
+            public void error(CacheSource from, int code, String info) {
+                Log.w(TAG, "error:" + info);
+                useCase.stopPoll();
+            }
+        });
+        cs.add(sc);
     }
 
     private class Person {

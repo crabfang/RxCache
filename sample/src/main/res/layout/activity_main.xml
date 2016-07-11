@@ -73,4 +73,12 @@
         android:onClick="clickLogin"
         android:text="click image" />
 
+    <Button
+        android:id="@+id/activity_main_btn_poll"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:onClick="clickPoll"
+        android:text="click poll" />
+
 </LinearLayout>
