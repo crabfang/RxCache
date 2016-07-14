@@ -50,11 +50,6 @@ public class DoubleCacheUseCase<T> extends AbstractCacheUseCase<T> {
 
     public DoubleCacheUseCase(TypeToken<T> typeT, RequestParams params, CacheMethod cacheMethod) {
         super(typeT, cacheMethod);
-        //DiskCache在主线程调用
-        if(cacheMethod != CacheMethod.HTTP) {
-            super.setExecutor(null);
-            super.setPostThread(null);
-        }
 
         setSaveData(true);
         setRequestParams(params);

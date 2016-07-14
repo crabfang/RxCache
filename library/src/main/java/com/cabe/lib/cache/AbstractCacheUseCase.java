@@ -7,6 +7,8 @@ import com.google.gson.reflect.TypeToken;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * 缓存用例抽象类<br>
@@ -27,6 +29,14 @@ public abstract class AbstractCacheUseCase<T> extends UseCase<T> {
 
     public void setCacheMethod(CacheMethod method) {
         this.cacheMethod = method;
+        //DiskCache在主线程调用
+        if(cacheMethod != CacheMethod.HTTP) {
+            super.setExecutor(null);
+            super.setPostThread(null);
+        } else {
+            super.setExecutor(Schedulers.io());
+            super.setPostThread(AndroidSchedulers.mainThread());
+        }
     }
 
     public CacheMethod getCacheMethod() {
