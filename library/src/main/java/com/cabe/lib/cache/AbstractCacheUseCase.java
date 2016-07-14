@@ -22,7 +22,11 @@ public abstract class AbstractCacheUseCase<T> extends UseCase<T> {
 
     public AbstractCacheUseCase(TypeToken<T> typeT, CacheMethod cacheMethod) {
         super(typeT);
-        this.cacheMethod = cacheMethod;
+        setCacheMethod(cacheMethod);
+    }
+
+    public void setCacheMethod(CacheMethod method) {
+        this.cacheMethod = method;
     }
 
     public CacheMethod getCacheMethod() {

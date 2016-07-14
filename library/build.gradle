@@ -37,6 +37,8 @@ dependencies {
     // https://github.com/square/okhttp
     compile 'com.squareup.okhttp:okhttp:2.7.5'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
+
+    compile 'com.squareup.sqlbrite:sqlbrite:0.7.0'
 }
 
 apply from: 'https://raw.githubusercontent.com/crabfang/BintrayGradle/master/maven.gradle'
