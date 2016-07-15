@@ -51,7 +51,11 @@ public class RequestParams {
         if(hostNew != null && hostNew.endsWith(File.separator)) {
             hostNew = hostNew.substring(0, hostNew.length() - 1);
         }
-        return Uri.parse(hostNew + File.separator + pathNew);
+        String url = hostNew;
+        if(pathNew != null && !pathNew.isEmpty()) {
+            url += File.separator + pathNew;
+        }
+        return Uri.parse(url);
     }
 
     public String getHost() {
@@ -70,6 +74,10 @@ public class RequestParams {
             index = 0;
         }
         index += host.length() + 1;
-        return url.substring(index);
+        String path = url.substring(index);
+        if(path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
     }
 }
