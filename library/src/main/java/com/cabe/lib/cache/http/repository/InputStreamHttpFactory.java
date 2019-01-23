@@ -62,7 +62,6 @@ public class InputStreamHttpFactory implements HttpFactoryInterface<InputStream>
         @POST("/{url}")
         Observable<InputStream> post(@Path(value = "url", encode = false) String path, @QueryMap Map<String, String> query, @FieldMap Map<String, String> body);
 
-        @FormUrlEncoded
         @POST("/{url}")
         Observable<InputStream> postBody(@Path(value = "url", encode = false) String path, @QueryMap Map<String, String> query, @Body TypedString body);
 
